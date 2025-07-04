@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movieapplication/Model/movie_model.dart';
 import 'package:movieapplication/View/widgets/movie_list.dart';
+import 'package:movieapplication/View/movie_detail_page.dart';
 
 // Example usage in your home page
 class MovieSection extends StatelessWidget {
@@ -29,9 +30,10 @@ class MovieSection extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
+                  fontFamily: 'Mulish',
                   color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               if (onSeeAll != null)
@@ -39,7 +41,7 @@ class MovieSection extends StatelessWidget {
                   onPressed: onSeeAll,
                   child: const Text(
                     'See All',
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(color: Colors.blue, fontFamily: 'Mulish'),
                   ),
                 ),
             ],
@@ -51,11 +53,20 @@ class MovieSection extends StatelessWidget {
           title: '',
           isLoading: isLoading,
           showRating: false,
+          heroTagPrefix: title.toLowerCase().replaceAll(' ', '_'),
           onMovieTap: (movie) {
             // Navigate to movie details page
-            // Navigator.push(context, MaterialPageRoute(
-            //   builder: (context) => MovieDetailPage(movie: movie),
-            // ));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => MovieDetailPage(
+                      movie: movie,
+                      heroTag:
+                          '${title.toLowerCase().replaceAll(' ', '_')}_movie_poster_${movie.id}',
+                    ),
+              ),
+            );
           },
         ),
       ],

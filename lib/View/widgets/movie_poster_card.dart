@@ -1,8 +1,9 @@
-// Reusable MoviePosterCard component
+// Updated MoviePosterCard with Hero animation and navigation
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:movieapplication/Model/movie_model.dart';
+import 'package:movieapplication/View/movie_detail_page.dart';
 
 class MoviePosterCard extends StatelessWidget {
   final Movie movie;
@@ -11,6 +12,7 @@ class MoviePosterCard extends StatelessWidget {
   final VoidCallback? onTap;
   final bool showRating;
   final bool showTitle;
+  final String? heroTag;
 
   const MoviePosterCard({
     Key? key,
@@ -20,68 +22,84 @@ class MoviePosterCard extends StatelessWidget {
     this.onTap,
     this.showRating = false,
     this.showTitle = true,
+    this.heroTag,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap ?? () => _navigateToDetail(context),
       child: Container(
         width: width,
         margin: const EdgeInsets.symmetric(horizontal: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Poster image with loading and error states
-            Container(
-              height: height,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child:
-                    movie.posterUrl.isNotEmpty
-                        ? CachedNetworkImage(
-                          imageUrl: movie.posterUrl,
-                          fit: BoxFit.cover,
-                          placeholder:
-                              (context, url) => Container(
-                                color: Colors.grey[800],
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
+            // Poster image with Hero animation
+            Hero(
+              tag: heroTag ?? 'movie_poster_${movie.id}',
+              child: Container(
+                height: height,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child:
+                      movie.posterUrl.isNotEmpty
+                          ? CachedNetworkImage(
+                            imageUrl: movie.posterUrl,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            placeholder:
+                                (context, url) => Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  color: Colors.grey[800],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                          errorWidget:
-                              (context, url, error) => Container(
-                                color: Colors.grey[800],
-                                child: const Icon(
-                                  Icons.movie,
-                                  color: Colors.white54,
-                                  size: 40,
+                            errorWidget:
+                                (context, url, error) => Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  color: Colors.grey[800],
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.movie,
+                                      color: Colors.white54,
+                                      size: 40,
+                                    ),
+                                  ),
                                 ),
+                          )
+                          : Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: Colors.grey[800],
+                            child: const Center(
+                              child: Icon(
+                                Icons.movie,
+                                color: Colors.white54,
+                                size: 40,
                               ),
-                        )
-                        : Container(
-                          color: Colors.grey[800],
-                          child: const Icon(
-                            Icons.movie,
-                            color: Colors.white54,
-                            size: 40,
+                            ),
                           ),
-                        ),
+                ),
               ),
             ),
 
@@ -97,6 +115,7 @@ class MoviePosterCard extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
+                      fontFamily: 'Mulish',
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -124,6 +143,31 @@ class MoviePosterCard extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  void _navigateToDetail(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder:
+            (context, animation, secondaryAnimation) =>
+                MovieDetailPage(movie: movie),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              ),
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400),
       ),
     );
   }

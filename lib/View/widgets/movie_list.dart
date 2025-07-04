@@ -9,6 +9,7 @@ class MovieList extends StatelessWidget {
   final bool showRating;
   final Function(Movie)? onMovieTap;
   final bool isLoading;
+  final String? heroTagPrefix;
 
   const MovieList({
     Key? key,
@@ -17,6 +18,7 @@ class MovieList extends StatelessWidget {
     this.showRating = false,
     this.onMovieTap,
     this.isLoading = false,
+    this.heroTagPrefix,
   }) : super(key: key);
 
   @override
@@ -43,13 +45,7 @@ class MovieList extends StatelessWidget {
         SizedBox(
           height: showRating ? 220 : 200,
           child:
-              isLoading
-                  ? const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                  : movies.isEmpty
+              movies.isEmpty
                   ? const Center(
                     child: Text(
                       'No movies available',
@@ -68,6 +64,10 @@ class MovieList extends StatelessWidget {
                         onTap:
                             onMovieTap != null
                                 ? () => onMovieTap!(movie)
+                                : null,
+                        heroTag:
+                            heroTagPrefix != null
+                                ? '${heroTagPrefix}_movie_poster_${movie.id}'
                                 : null,
                       );
                     },

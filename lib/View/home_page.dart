@@ -5,6 +5,7 @@ import 'package:movieapplication/ViewModel/movie_provider.dart';
 import 'package:movieapplication/View/widgets/movie_list.dart';
 import 'package:movieapplication/View/widgets/movie_grid.dart';
 import 'package:movieapplication/View/widgets/movie_section.dart';
+import 'package:movieapplication/View/movie_detail_page.dart';
 
 // Updated Home Page using Provider
 class MovieHomePage extends StatefulWidget {
@@ -171,8 +172,31 @@ class _MovieHomePageState extends State<MovieHomePage> {
               return MovieGrid(
                 movies: provider.searchResults,
                 isLoading: provider.isSearching,
+                heroTagPrefix: 'search',
                 onMovieTap: (movie) {
-                  // Navigate to movie details
+                  try {
+                    print(
+                      'Navigating to movie detail: ${movie.title} (ID: ${movie.id})',
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => MovieDetailPage(
+                              movie: movie,
+                              heroTag: 'search_movie_poster_${movie.id}',
+                            ),
+                      ),
+                    );
+                  } catch (e) {
+                    print('Error navigating to movie detail: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
               );
             },
@@ -196,8 +220,18 @@ class _MovieHomePageState extends State<MovieHomePage> {
 
         return MovieGrid(
           movies: provider.watchlist,
+          heroTagPrefix: 'watchlist',
           onMovieTap: (movie) {
-            // Navigate to movie details
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => MovieDetailPage(
+                      movie: movie,
+                      heroTag: 'watchlist_movie_poster_${movie.id}',
+                    ),
+              ),
+            );
           },
         );
       },

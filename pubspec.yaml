@@ -82,7 +82,12 @@ flutter:
         - asset: assets/fonts/OpenSans-Regular.ttf
         - asset: assets/fonts/OpenSans-Bold.ttf
           weight: 700
-
+    - family: WorkSans
+      fonts:
+        - asset: assets/fonts/WorkSans-Regular.ttf
+    - family: Mulish
+      fonts:
+        - asset: assets/fonts/Mulish-Regular.ttf
 
   #
   # For details regarding fonts from package dependencies,

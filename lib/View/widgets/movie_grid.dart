@@ -7,6 +7,7 @@ class MovieGrid extends StatelessWidget {
   final Function(Movie)? onMovieTap;
   final bool isLoading;
   final bool showRating;
+  final String? heroTagPrefix;
 
   const MovieGrid({
     Key? key,
@@ -14,18 +15,11 @@ class MovieGrid extends StatelessWidget {
     this.onMovieTap,
     this.isLoading = false,
     this.showRating = true,
+    this.heroTagPrefix,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-        ),
-      );
-    }
-
     if (movies.isEmpty) {
       return const Center(
         child: Text(
@@ -52,6 +46,10 @@ class MovieGrid extends StatelessWidget {
           height: 200,
           showRating: showRating,
           onTap: onMovieTap != null ? () => onMovieTap!(movie) : null,
+          heroTag:
+              heroTagPrefix != null
+                  ? '${heroTagPrefix}_movie_poster_${movie.id}'
+                  : null,
         );
       },
     );
