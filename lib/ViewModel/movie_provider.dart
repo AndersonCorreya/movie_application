@@ -33,7 +33,7 @@ class MovieProvider extends ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   // Replace with your actual API key
-  final String _apiKey = 'YOUR_TMDB_API_KEY';
+  final String _apiKey = 'b0ef6658940e112228613dffb70d5996';
   final String _baseUrl = 'https://api.themoviedb.org/3';
 
   // Fetch popular movies

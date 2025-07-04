@@ -69,6 +69,10 @@ class _MovieHomePageState extends State<MovieHomePage> {
             },
             icon: const Icon(Icons.settings, color: Colors.white),
           ),
+          CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(Icons.person, color: Colors.black),
+          ),
         ],
       ),
       body: IndexedStack(
@@ -103,7 +107,7 @@ class _MovieHomePageState extends State<MovieHomePage> {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
             // Top Rated Movies Section
             Consumer<MovieProvider>(
               builder: (context, provider, child) {
@@ -117,7 +121,7 @@ class _MovieHomePageState extends State<MovieHomePage> {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
             // Upcoming Movies Section
             Consumer<MovieProvider>(
               builder: (context, provider, child) {
@@ -131,7 +135,7 @@ class _MovieHomePageState extends State<MovieHomePage> {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
           ],
         ),
       ),

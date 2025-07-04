@@ -45,12 +45,12 @@ class MovieSection extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+
         MovieList(
           movies: movies,
           title: '',
           isLoading: isLoading,
-          showRating: true,
+          showRating: false,
           onMovieTap: (movie) {
             // Navigate to movie details page
             // Navigator.push(context, MaterialPageRoute(
