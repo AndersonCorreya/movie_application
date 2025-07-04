@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movieapplication/Model/movie_model.dart';
+import 'package:movieapplication/config/secrets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -36,9 +37,9 @@ class MovieProvider extends ChangeNotifier {
 
   String get errorMessage => _errorMessage;
 
-  // Replace with your actual API key
-  final String _apiKey = 'b0ef6658940e112228613dffb70d5996';
-  final String _baseUrl = 'https://api.themoviedb.org/3';
+  // API configuration from secrets
+  final String _apiKey = Secrets.movieApiKey;
+  final String _baseUrl = Secrets.movieBaseUrl;
 
   // Fetch popular movies
   Future<void> fetchPopularMovies() async {

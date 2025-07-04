@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:movieapplication/core/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:movieapplication/ViewModel/movie_provider.dart';
@@ -44,9 +45,35 @@ class _MovieHomePageState extends State<MovieHomePage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+        items: [
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              'assets/icons/icons8-home.svg',
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                _selectedIndex == 0
+                    ? Colors.white
+                    : Colors.white.withOpacity(0.5),
+                BlendMode.srcIn,
+              ),
+            ),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              'assets/icons/icons8-search.svg',
+              width: 18,
+              height: 18,
+              colorFilter: ColorFilter.mode(
+                _selectedIndex == 1
+                    ? Colors.white
+                    : Colors.white.withOpacity(0.5),
+                BlendMode.srcIn,
+              ),
+            ),
+            label: 'Search',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bookmark),
             label: 'Watchlist',
