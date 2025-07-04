@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movieapplication/Model/movie_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 // Movie Provider for state management
 class MovieProvider extends ChangeNotifier {
@@ -17,6 +18,9 @@ class MovieProvider extends ChangeNotifier {
   bool _isSearching = false;
 
   String _errorMessage = '';
+
+  // Debouncer for search
+  Timer? _searchDebouncer;
 
   // Getters
   List<Movie> get popularMovies => _popularMovies;
@@ -120,21 +124,39 @@ class MovieProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Search movies
-  Future<void> searchMovies(String query) async {
+  // Search movies with debouncing
+  void searchMovies(String query) {
+    // Cancel previous timer if it exists
+    _searchDebouncer?.cancel();
+
     if (query.isEmpty) {
       _searchResults = [];
+      _isSearching = false;
       notifyListeners();
       return;
     }
 
+    // Set loading state immediately
+    _isSearching = true;
+    notifyListeners();
+
+    // Create a new timer for debouncing (500ms delay)
+    _searchDebouncer = Timer(const Duration(milliseconds: 500), () {
+      _performSearch(query);
+    });
+  }
+
+  // Actual search implementation
+  Future<void> _performSearch(String query) async {
     _isSearching = true;
     _errorMessage = '';
     notifyListeners();
 
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/search/movie?api_key=$_apiKey&query=$query'),
+        Uri.parse(
+          '$_baseUrl/search/movie?api_key=$_apiKey&query=${Uri.encodeComponent(query)}',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -178,5 +200,11 @@ class MovieProvider extends ChangeNotifier {
       fetchTopRatedMovies(),
       fetchUpcomingMovies(),
     ]);
+  }
+
+  @override
+  void dispose() {
+    _searchDebouncer?.cancel();
+    super.dispose();
   }
 }
