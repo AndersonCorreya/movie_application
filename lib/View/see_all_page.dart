@@ -153,6 +153,7 @@ class _SeeAllPageState extends State<SeeAllPage> {
             color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
+            fontFamily: 'Mulish',
           ),
         ),
         centerTitle: true,

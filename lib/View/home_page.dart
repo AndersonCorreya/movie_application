@@ -3,11 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:movieapplication/core/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:movieapplication/ViewModel/movie_provider.dart';
-import 'package:movieapplication/View/widgets/movie_list.dart';
+
 import 'package:movieapplication/View/widgets/movie_grid.dart';
 import 'package:movieapplication/View/widgets/movie_section.dart';
 import 'package:movieapplication/View/movie_detail_page.dart';
 import 'package:movieapplication/View/see_all_page.dart';
+import 'package:movieapplication/View/watchlist_page.dart';
 
 // Updated Home Page using Provider
 class MovieHomePage extends StatefulWidget {
@@ -92,24 +93,13 @@ class _MovieHomePageState extends State<MovieHomePage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: const Text('Movie App'),
+        title: const Text('MyFlicks'),
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.bold,
+          fontFamily: 'WorkSans',
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Navigate to settings or search
-            },
-            icon: const Icon(Icons.settings, color: Colors.white),
-          ),
-          CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(Icons.person, color: Colors.black),
-          ),
-        ],
       ),
       body: IndexedStack(
         index: _selectedIndex,
@@ -269,35 +259,7 @@ class _MovieHomePageState extends State<MovieHomePage> {
   }
 
   Widget _buildWatchlistPage() {
-    return Consumer<MovieProvider>(
-      builder: (context, provider, child) {
-        if (provider.watchlist.isEmpty) {
-          return const Center(
-            child: Text(
-              'Your watchlist is empty',
-              style: TextStyle(color: Colors.white70, fontSize: 16),
-            ),
-          );
-        }
-
-        return MovieGrid(
-          movies: provider.watchlist,
-          heroTagPrefix: 'watchlist',
-          onMovieTap: (movie) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (context) => MovieDetailPage(
-                      movie: movie,
-                      heroTag: 'watchlist_movie_poster_${movie.id}',
-                    ),
-              ),
-            );
-          },
-        );
-      },
-    );
+    return const WatchlistPage();
   }
 
   Widget _buildProfilePage() {

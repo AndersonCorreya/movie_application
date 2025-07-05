@@ -169,21 +169,64 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             child: Consumer<MovieProvider>(
               builder: (context, provider, child) {
                 final isInWatchlist = provider.isInWatchlist(widget.movie);
-                return IconButton(
+                return PopupMenuButton<String>(
                   icon: Icon(
                     isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
                     color: isInWatchlist ? Colors.amber : Colors.white,
                   ),
-                  onPressed: () {
+                  onSelected: (value) {
                     HapticFeedback.lightImpact();
-                    if (isInWatchlist) {
-                      provider.removeFromWatchlist(widget.movie);
-                      _showSnackBar('Removed from watchlist');
-                    } else {
-                      provider.addToWatchlist(widget.movie);
-                      _showSnackBar('Added to watchlist');
+                    if (value == 'quick_add') {
+                      if (isInWatchlist) {
+                        provider.removeFromWatchlist(widget.movie);
+                        _showSnackBar('Removed from watchlist');
+                      } else {
+                        provider.addToWatchlist(widget.movie);
+                        _showSnackBar('Added to watchlist');
+                      }
+                    } else if (value == 'add_to_list') {
+                      _showWatchlistSelectionDialog();
                     }
                   },
+                  itemBuilder:
+                      (context) => [
+                        PopupMenuItem(
+                          value: 'quick_add',
+                          child: Row(
+                            children: [
+                              Icon(
+                                isInWatchlist
+                                    ? Icons.bookmark_remove
+                                    : Icons.bookmark_add,
+                                color: isInWatchlist ? Colors.red : Colors.blue,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                isInWatchlist
+                                    ? 'Remove from Watchlist'
+                                    : 'Quick Add to Watchlist',
+                                style: TextStyle(
+                                  color:
+                                      isInWatchlist ? Colors.red : Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'add_to_list',
+                          child: Row(
+                            children: [
+                              Icon(Icons.playlist_add, color: Colors.green),
+                              SizedBox(width: 8),
+                              Text(
+                                'Add to Custom List',
+                                style: TextStyle(color: Colors.green),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                 );
               },
             ),
@@ -573,6 +616,175 @@ class _MovieDetailPageState extends State<MovieDetailPage>
           ),
         ],
       ),
+    );
+  }
+
+  void _showWatchlistSelectionDialog() {
+    final provider = context.read<MovieProvider>();
+    final watchlists = provider.customWatchlists;
+
+    if (watchlists.isEmpty) {
+      _showCreateWatchlistDialog();
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1C2128),
+            title: const Text(
+              'Add to Watchlist',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: watchlists.length,
+                itemBuilder: (context, index) {
+                  final watchlist = watchlists[index];
+                  final isInWatchlist = provider.isMovieInWatchlist(
+                    watchlist.id,
+                    widget.movie,
+                  );
+
+                  return ListTile(
+                    leading: Icon(
+                      isInWatchlist
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      color: isInWatchlist ? Colors.green : Colors.white70,
+                    ),
+                    title: Text(
+                      watchlist.name,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      '${watchlist.movieCount} movies',
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    onTap: () async {
+                      if (isInWatchlist) {
+                        await provider.removeMovieFromWatchlist(
+                          watchlist.id,
+                          widget.movie,
+                        );
+                        _showSnackBar('Removed from ${watchlist.name}');
+                      } else {
+                        await provider.addMovieToWatchlist(
+                          watchlist.id,
+                          widget.movie,
+                        );
+                        _showSnackBar('Added to ${watchlist.name}');
+                      }
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showCreateWatchlistDialog();
+                },
+                child: const Text('Create New List'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showCreateWatchlistDialog() {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1C2128),
+            title: const Text(
+              'Create New Watchlist',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    labelText: 'Watchlist Name',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white30),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descriptionController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    labelText: 'Description (Optional)',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white30),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (nameController.text.trim().isNotEmpty) {
+                    final watchlist = await context
+                        .read<MovieProvider>()
+                        .createCustomWatchlist(
+                          nameController.text.trim(),
+                          description: descriptionController.text.trim(),
+                        );
+                    await context.read<MovieProvider>().addMovieToWatchlist(
+                      watchlist.id,
+                      widget.movie,
+                    );
+                    Navigator.pop(context);
+                    _showSnackBar(
+                      'Created "${watchlist.name}" and added movie',
+                    );
+                  }
+                },
+                child: const Text('Create & Add'),
+              ),
+            ],
+          ),
     );
   }
 

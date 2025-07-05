@@ -3,17 +3,25 @@ import 'package:movieapplication/ViewModel/movie_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:movieapplication/View/home_page.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize the movie provider and watchlist service
+  final movieProvider = MovieProvider();
+  await movieProvider.initializeWatchlistService();
+
+  runApp(MyApp(movieProvider: movieProvider));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final MovieProvider movieProvider;
+
+  const MyApp({super.key, required this.movieProvider});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MovieProvider(),
+    return ChangeNotifierProvider.value(
+      value: movieProvider,
       child: MaterialApp(
         title: 'Movie App',
         theme: ThemeData(

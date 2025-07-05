@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:movieapplication/Model/movie_model.dart';
 import 'package:movieapplication/Model/cast_model.dart';
+import 'package:movieapplication/Model/watchlist_model.dart';
+import 'package:movieapplication/services/watchlist_service.dart';
 import 'package:movieapplication/config/secrets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,6 +15,7 @@ class MovieProvider extends ChangeNotifier {
   List<Movie> _upcomingMovies = [];
   List<Movie> _searchResults = [];
   List<Movie> _watchlist = [];
+  List<Watchlist> _customWatchlists = [];
   Map<int, List<CastMember>> _movieCast = {};
 
   // Pagination support for "See All" pages
@@ -41,12 +44,16 @@ class MovieProvider extends ChangeNotifier {
   // Debouncer for search
   Timer? _searchDebouncer;
 
+  // Watchlist service
+  final WatchlistService _watchlistService = WatchlistService();
+
   // Getters
   List<Movie> get popularMovies => _popularMovies;
   List<Movie> get topRatedMovies => _topRatedMovies;
   List<Movie> get upcomingMovies => _upcomingMovies;
   List<Movie> get searchResults => _searchResults;
   List<Movie> get watchlist => _watchlist;
+  List<Watchlist> get customWatchlists => _customWatchlists;
   Map<int, List<CastMember>> get movieCast => _movieCast;
 
   // "See All" page getters
@@ -72,6 +79,100 @@ class MovieProvider extends ChangeNotifier {
   // API configuration from secrets
   final String _apiKey = Secrets.movieApiKey;
   final String _baseUrl = Secrets.movieBaseUrl;
+
+  // Initialize watchlist service
+  Future<void> initializeWatchlistService() async {
+    await _watchlistService.initialize();
+    await loadCustomWatchlists();
+  }
+
+  // Load custom watchlists from storage
+  Future<void> loadCustomWatchlists() async {
+    _customWatchlists = _watchlistService.getAllWatchlists();
+    notifyListeners();
+  }
+
+  // Create a new custom watchlist
+  Future<Watchlist> createCustomWatchlist(
+    String name, {
+    String description = '',
+  }) async {
+    final watchlist = await _watchlistService.createWatchlist(
+      name,
+      description: description,
+    );
+    _customWatchlists.add(watchlist);
+    notifyListeners();
+    return watchlist;
+  }
+
+  // Delete a custom watchlist
+  Future<void> deleteCustomWatchlist(String id) async {
+    await _watchlistService.deleteWatchlist(id);
+    _customWatchlists.removeWhere((w) => w.id == id);
+    notifyListeners();
+  }
+
+  // Update a custom watchlist
+  Future<void> updateCustomWatchlist(
+    String id,
+    String name, {
+    String description = '',
+  }) async {
+    final watchlist = _customWatchlists.firstWhere((w) => w.id == id);
+    final updatedWatchlist = Watchlist(
+      id: id,
+      name: name,
+      description: description,
+      movies: watchlist.movies,
+    );
+
+    await _watchlistService.updateWatchlist(updatedWatchlist);
+    final index = _customWatchlists.indexWhere((w) => w.id == id);
+    if (index != -1) {
+      _customWatchlists[index] = updatedWatchlist;
+      notifyListeners();
+    }
+  }
+
+  // Add movie to a specific watchlist
+  Future<void> addMovieToWatchlist(String watchlistId, Movie movie) async {
+    await _watchlistService.addMovieToWatchlist(watchlistId, movie);
+    await loadCustomWatchlists(); // Reload to get updated data
+  }
+
+  // Remove movie from a specific watchlist
+  Future<void> removeMovieFromWatchlist(String watchlistId, Movie movie) async {
+    await _watchlistService.removeMovieFromWatchlist(watchlistId, movie);
+    await loadCustomWatchlists(); // Reload to get updated data
+  }
+
+  // Check if movie is in a specific watchlist
+  bool isMovieInWatchlist(String watchlistId, Movie movie) {
+    return _watchlistService.isMovieInWatchlist(watchlistId, movie);
+  }
+
+  // Get all watchlists containing a specific movie
+  List<Watchlist> getWatchlistsContainingMovie(Movie movie) {
+    return _watchlistService.getWatchlistsContainingMovie(movie);
+  }
+
+  // Legacy watchlist methods (for backward compatibility)
+  void addToWatchlist(Movie movie) {
+    if (!_watchlist.any((m) => m.id == movie.id)) {
+      _watchlist.add(movie);
+      notifyListeners();
+    }
+  }
+
+  void removeFromWatchlist(Movie movie) {
+    _watchlist.removeWhere((m) => m.id == movie.id);
+    notifyListeners();
+  }
+
+  bool isInWatchlist(Movie movie) {
+    return _watchlist.any((m) => m.id == movie.id);
+  }
 
   // Fetch popular movies (initial load - first page only)
   Future<void> fetchPopularMovies() async {
@@ -366,23 +467,6 @@ class MovieProvider extends ChangeNotifier {
 
     _isSearching = false;
     notifyListeners();
-  }
-
-  // Watchlist management
-  void addToWatchlist(Movie movie) {
-    if (!_watchlist.any((m) => m.id == movie.id)) {
-      _watchlist.add(movie);
-      notifyListeners();
-    }
-  }
-
-  void removeFromWatchlist(Movie movie) {
-    _watchlist.removeWhere((m) => m.id == movie.id);
-    notifyListeners();
-  }
-
-  bool isInWatchlist(Movie movie) {
-    return _watchlist.any((m) => m.id == movie.id);
   }
 
   // Fetch cast for a specific movie
