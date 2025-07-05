@@ -43,7 +43,7 @@ class MovieList extends StatelessWidget {
           const SizedBox(height: 16),
         ],
         SizedBox(
-          height: showRating ? 220 : 200,
+          height: showRating ? 240 : 220,
           child:
               movies.isEmpty
                   ? const Center(

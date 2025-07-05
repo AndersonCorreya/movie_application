@@ -8,6 +8,7 @@ class MovieGrid extends StatelessWidget {
   final bool isLoading;
   final bool showRating;
   final String? heroTagPrefix;
+  final ScrollController? scrollController;
 
   const MovieGrid({
     Key? key,
@@ -16,6 +17,7 @@ class MovieGrid extends StatelessWidget {
     this.isLoading = false,
     this.showRating = true,
     this.heroTagPrefix,
+    this.scrollController,
   }) : super(key: key);
 
   @override
@@ -30,10 +32,11 @@ class MovieGrid extends StatelessWidget {
     }
 
     return GridView.builder(
+      controller: scrollController,
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.7,
+        childAspectRatio: 0.65,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),

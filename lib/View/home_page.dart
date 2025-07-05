@@ -7,6 +7,7 @@ import 'package:movieapplication/View/widgets/movie_list.dart';
 import 'package:movieapplication/View/widgets/movie_grid.dart';
 import 'package:movieapplication/View/widgets/movie_section.dart';
 import 'package:movieapplication/View/movie_detail_page.dart';
+import 'package:movieapplication/View/see_all_page.dart';
 
 // Updated Home Page using Provider
 class MovieHomePage extends StatefulWidget {
@@ -41,7 +42,7 @@ class _MovieHomePageState extends State<MovieHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.transparent,
         selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(0.5),
+        unselectedItemColor: Colors.white.withValues(alpha: 0.5),
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -54,7 +55,7 @@ class _MovieHomePageState extends State<MovieHomePage> {
               colorFilter: ColorFilter.mode(
                 _selectedIndex == 0
                     ? Colors.white
-                    : Colors.white.withOpacity(0.5),
+                    : Colors.white.withValues(alpha: 0.5),
                 BlendMode.srcIn,
               ),
             ),
@@ -63,19 +64,26 @@ class _MovieHomePageState extends State<MovieHomePage> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
               'assets/icons/icons8-search.svg',
-              width: 18,
-              height: 18,
+              width: 20,
+              height: 20,
               colorFilter: ColorFilter.mode(
                 _selectedIndex == 1
                     ? Colors.white
-                    : Colors.white.withOpacity(0.5),
+                    : Colors.white.withValues(alpha: 0.5),
                 BlendMode.srcIn,
               ),
             ),
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
+            icon: Icon(
+              Icons.bookmark_outline,
+              size: 22,
+              color:
+                  _selectedIndex == 2
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: 0.5),
+            ),
             label: 'Watchlist',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
@@ -130,7 +138,16 @@ class _MovieHomePageState extends State<MovieHomePage> {
                   movies: provider.popularMovies,
                   isLoading: provider.isLoadingPopular,
                   onSeeAll: () {
-                    // Navigate to full list page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const SeeAllPage(
+                              category: MovieCategory.popular,
+                              title: 'Popular Movies',
+                            ),
+                      ),
+                    );
                   },
                 );
               },
@@ -144,7 +161,16 @@ class _MovieHomePageState extends State<MovieHomePage> {
                   movies: provider.topRatedMovies,
                   isLoading: provider.isLoadingTopRated,
                   onSeeAll: () {
-                    // Navigate to full list page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const SeeAllPage(
+                              category: MovieCategory.topRated,
+                              title: 'Top Rated Movies',
+                            ),
+                      ),
+                    );
                   },
                 );
               },
@@ -158,7 +184,16 @@ class _MovieHomePageState extends State<MovieHomePage> {
                   movies: provider.upcomingMovies,
                   isLoading: provider.isLoadingUpcoming,
                   onSeeAll: () {
-                    // Navigate to full list page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const SeeAllPage(
+                              category: MovieCategory.upcoming,
+                              title: 'Upcoming Movies',
+                            ),
+                      ),
+                    );
                   },
                 );
               },

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:movieapplication/Model/movie_model.dart';
+import 'package:movieapplication/Model/cast_model.dart';
 import 'package:movieapplication/ViewModel/movie_provider.dart';
 
 class MovieDetailPage extends StatefulWidget {
@@ -26,12 +27,15 @@ class _MovieDetailPageState extends State<MovieDetailPage>
 
   bool _isAppBarVisible = true;
   double _scrollOffset = 0;
+  List<CastMember> _castMembers = [];
+  bool _isLoadingCast = false;
 
   @override
   void initState() {
     super.initState();
     _initializeAnimations();
     _setupScrollController();
+    _loadCastData();
   }
 
   void _initializeAnimations() {
@@ -67,6 +71,28 @@ class _MovieDetailPageState extends State<MovieDetailPage>
         _isAppBarVisible = _scrollOffset < 200;
       });
     });
+  }
+
+  Future<void> _loadCastData() async {
+    if (_castMembers.isNotEmpty) return; // Already loaded
+
+    setState(() {
+      _isLoadingCast = true;
+    });
+
+    try {
+      final provider = context.read<MovieProvider>();
+      final cast = await provider.fetchMovieCast(widget.movie.id);
+
+      setState(() {
+        _castMembers = cast;
+        _isLoadingCast = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingCast = false;
+      });
+    }
   }
 
   @override
@@ -312,7 +338,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildActionButtons(),
+                  _buildCastSection(),
                   const SizedBox(height: 24),
                   _buildMovieInfo(),
                   const SizedBox(height: 24),
@@ -328,56 +354,110 @@ class _MovieDetailPageState extends State<MovieDetailPage>
     );
   }
 
-  Widget _buildActionButtons() {
-    return Row(
+  Widget _buildCastSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () {
-              HapticFeedback.mediumImpact();
-              _showSnackBar('Play feature coming soon!');
-            },
-            icon: const Icon(Icons.play_arrow, color: Colors.black),
-            label: const Text(
-              'Play',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+        const Text(
+          'Cast',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              _showSnackBar('Download feature coming soon!');
-            },
-            icon: const Icon(Icons.download, color: Colors.white),
-            label: const Text(
-              'Download',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+        const SizedBox(height: 16),
+        if (_isLoadingCast)
+          SizedBox(
+            height: 110,
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.white),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          )
+        else if (_castMembers.isEmpty)
+          SizedBox(
+            height: 110,
+            child: Center(
+              child: Text(
+                'No cast information available',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
+            ),
+          )
+        else
+          SizedBox(
+            height: 110,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _castMembers.length,
+              itemBuilder: (context, index) {
+                final castMember = _castMembers[index];
+                return Container(
+                  margin: const EdgeInsets.only(right: 16),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(shape: BoxShape.circle),
+                        child: ClipOval(
+                          child:
+                              castMember.profileUrl.isNotEmpty
+                                  ? CachedNetworkImage(
+                                    imageUrl: castMember.profileUrl,
+                                    fit: BoxFit.cover,
+                                    placeholder:
+                                        (context, url) => Container(
+                                          color: Colors.grey[800],
+                                          child: const Icon(
+                                            Icons.person,
+                                            color: Colors.white54,
+                                            size: 30,
+                                          ),
+                                        ),
+                                    errorWidget:
+                                        (context, url, error) => Container(
+                                          color: Colors.grey[800],
+                                          child: const Icon(
+                                            Icons.person,
+                                            color: Colors.white54,
+                                            size: 30,
+                                          ),
+                                        ),
+                                  )
+                                  : Container(
+                                    color: Colors.grey[800],
+                                    child: const Icon(
+                                      Icons.person,
+                                      color: Colors.white54,
+                                      size: 30,
+                                    ),
+                                  ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: 60,
+                        child: Text(
+                          castMember.name,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
-        ),
       ],
     );
   }
