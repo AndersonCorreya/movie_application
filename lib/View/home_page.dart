@@ -39,15 +39,15 @@ class _MovieHomePageState extends State<MovieHomePage> {
   String _getAppBarTitle() {
     switch (_selectedIndex) {
       case 0:
-        return 'MyFlicks';
+        return 'MYFLICKS';
       case 1:
         return 'Search';
       case 2:
-        return 'Watchlist';
+        return 'MYFLICKS';
       case 3:
         return 'Settings';
       default:
-        return 'MyFlicks';
+        return 'MYFLICKS';
     }
   }
 
@@ -125,6 +125,7 @@ class _MovieHomePageState extends State<MovieHomePage> {
         ],
       ),
       appBar: AppBar(
+        scrolledUnderElevation: 0.0,
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: Text(_getAppBarTitle()),
@@ -132,9 +133,9 @@ class _MovieHomePageState extends State<MovieHomePage> {
           color:
               theme.appBarTheme.titleTextStyle?.color ??
               theme.colorScheme.onBackground,
-          fontSize: 20,
+          fontSize: 24,
           fontWeight: FontWeight.bold,
-          fontFamily: 'Helvetica',
+          fontFamily: 'Playair',
         ),
       ),
       body: IndexedStack(
@@ -355,9 +356,29 @@ class _MovieHomePageState extends State<MovieHomePage> {
         Expanded(
           child: Consumer<MovieProvider>(
             builder: (context, provider, child) {
+              // Show blank area when no search has been performed
+              if (provider.searchResults.isEmpty && !provider.isSearching) {
+                return Container(
+                  // This creates a blank area that takes up the remaining space
+                  color: Colors.transparent,
+                );
+              }
+
+              // Show loading indicator when searching
+              if (provider.isSearching) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      theme.colorScheme.primary,
+                    ),
+                  ),
+                );
+              }
+
+              // Show search results or "No movies found" only when there are search results
               return MovieGrid(
                 movies: provider.searchResults,
-                isLoading: provider.isSearching,
+                isLoading: false, // We already handled loading state above
                 heroTagPrefix: 'search',
                 onMovieTap: (movie) {
                   try {

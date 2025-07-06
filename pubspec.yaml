@@ -98,6 +98,9 @@ flutter:
     - family: Helvetica   
       fonts:
         - asset: assets/fonts/Helvetica-Bold.ttf
+    - family: Playair
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay-Bold.ttf
 
   #
   # For details regarding fonts from package dependencies,

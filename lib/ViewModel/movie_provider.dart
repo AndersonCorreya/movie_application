@@ -123,7 +123,7 @@ class MovieProvider extends ChangeNotifier {
   bool get hasMoreNowPlaying => _hasMoreNowPlaying;
 
   // API configuration from secrets
-  final String _apiKey = Secrets.movieApiKey;
+  final String _apiKey = 'b0ef6658940e112228613dffb70d5996';
   final String _baseUrl = Secrets.movieBaseUrl;
 
   // Initialize watchlist service

@@ -175,6 +175,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
                     ),
                   ),
                   maxLines: 2,
+                  textCapitalization: TextCapitalization.sentences,
                 ),
               ],
             ),
@@ -572,9 +573,9 @@ class _WatchlistPageState extends State<WatchlistPage> {
                         ),
                         if (!isDefault) // Only show popup menu for non-default watchlists
                           PopupMenuButton<String>(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.more_vert,
-                              color: Colors.white70,
+                              color: theme.colorScheme.onSurface,
                             ),
                             onSelected: (value) {
                               if (value == 'edit') {
@@ -585,7 +586,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
                             },
                             itemBuilder:
                                 (context) => [
-                                  const PopupMenuItem(
+                                  PopupMenuItem(
                                     value: 'edit',
                                     child: Row(
                                       children: [
