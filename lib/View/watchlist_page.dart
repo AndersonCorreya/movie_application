@@ -498,11 +498,8 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                 children: [
                                   Text(
                                     watchlist.name,
-                                    style: TextStyle(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.titleLarge?.color,
+                                    style: const TextStyle(
+                                      color: Colors.white,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -540,11 +537,8 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                 const SizedBox(height: 4),
                                 Text(
                                   watchlist.description,
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(
-                                          context,
-                                        ).textTheme.titleLarge?.color,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
                                     fontSize: 14,
                                   ),
                                   maxLines: 2,
@@ -554,11 +548,8 @@ class _WatchlistPageState extends State<WatchlistPage> {
                               const SizedBox(height: 4),
                               Text(
                                 '${watchlist.movieCount} movie${watchlist.movieCount != 1 ? 's' : ''}',
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).textTheme.titleLarge?.color,
+                                style: const TextStyle(
+                                  color: Colors.white54,
                                   fontSize: 12,
                                 ),
                               ),
@@ -633,13 +624,7 @@ class WatchlistDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(
-          watchlist.name,
-          style: TextStyle(
-            fontFamily: 'Mulish',
-            color: theme.textTheme.titleLarge?.color,
-          ),
-        ),
+        title: Text(watchlist.name, style: TextStyle(fontFamily: 'Mulish')),
         actions: [
           if (!watchlist
               .isDefaultWatchlist) // Only show delete option for non-default watchlists
@@ -684,21 +669,18 @@ class WatchlistDetailPage extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 16),
-                    Text(
+                    const Text(
                       'No movies in this watchlist',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.titleLarge?.color,
+                        color: Colors.white70,
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'Add movies from the movie details page',
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.titleLarge?.color,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.white54, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
                   ],

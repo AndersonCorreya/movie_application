@@ -192,20 +192,13 @@ class _SeeAllPageState extends State<SeeAllPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color:
-                theme.appBarTheme.iconTheme?.color ??
-                theme.colorScheme.onBackground,
-          ),
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onBackground),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           widget.title,
           style: TextStyle(
-            color:
-                theme.appBarTheme.titleTextStyle?.color ??
-                theme.colorScheme.onBackground,
+            color: theme.colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontFamily: 'Mulish',
