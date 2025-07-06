@@ -244,7 +244,12 @@ class _WatchlistPageState extends State<WatchlistPage> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('Delete'),
+                child: Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                ),
               ),
             ],
           ),
@@ -498,8 +503,11 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                 children: [
                                   Text(
                                     watchlist.name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge?.color,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -537,8 +545,11 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                 const SizedBox(height: 4),
                                 Text(
                                   watchlist.description,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.titleLarge?.color,
                                     fontSize: 14,
                                   ),
                                   maxLines: 2,
@@ -548,8 +559,11 @@ class _WatchlistPageState extends State<WatchlistPage> {
                               const SizedBox(height: 4),
                               Text(
                                 '${watchlist.movieCount} movie${watchlist.movieCount != 1 ? 's' : ''}',
-                                style: const TextStyle(
-                                  color: Colors.white54,
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.color,
                                   fontSize: 12,
                                 ),
                               ),

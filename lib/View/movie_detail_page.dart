@@ -70,16 +70,19 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   void _setupScrollController() {
     _scrollController = ScrollController();
     _scrollController.addListener(() {
-      setState(() {
-        _scrollOffset = _scrollController.offset;
-        _isAppBarVisible = _scrollOffset < 200;
-      });
+      if (mounted) {
+        setState(() {
+          _scrollOffset = _scrollController.offset;
+          _isAppBarVisible = _scrollOffset < 200;
+        });
+      }
     });
   }
 
   Future<void> _loadTrailerData() async {
     if (_trailerVideoId != null) return; // Already loaded
 
+    if (!mounted) return;
     setState(() {
       _isLoadingTrailer = true;
     });
@@ -88,11 +91,13 @@ class _MovieDetailPageState extends State<MovieDetailPage>
       final provider = context.read<MovieProvider>();
       final trailerId = await provider.fetchMovieTrailer(widget.movie.id);
 
+      if (!mounted) return;
       setState(() {
         _trailerVideoId = trailerId;
         _isLoadingTrailer = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoadingTrailer = false;
       });
@@ -102,6 +107,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   Future<void> _loadCastData() async {
     if (_castMembers.isNotEmpty) return; // Already loaded
 
+    if (!mounted) return;
     setState(() {
       _isLoadingCast = true;
     });
@@ -110,11 +116,13 @@ class _MovieDetailPageState extends State<MovieDetailPage>
       final provider = context.read<MovieProvider>();
       final cast = await provider.fetchMovieCast(widget.movie.id);
 
+      if (!mounted) return;
       setState(() {
         _castMembers = cast;
         _isLoadingCast = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoadingCast = false;
       });
@@ -131,28 +139,30 @@ class _MovieDetailPageState extends State<MovieDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     // Add safety check for movie data
     if (widget.movie.id == 0 || widget.movie.title.isEmpty) {
       return Scaffold(
-        backgroundColor: const Color(0xFF0A0A0A),
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: const Center(
+        body: Center(
           child: Text(
             'Invalid movie data',
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 18),
           ),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: CustomScrollView(
@@ -163,6 +173,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final theme = Theme.of(context);
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -177,7 +188,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
@@ -207,10 +218,14 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                     if (value == 'quick_add') {
                       if (isInWatchlist) {
                         await provider.removeFromDefaultWatchlist(widget.movie);
-                        _showSnackBar('Removed from default watchlist');
+                        if (mounted) {
+                          _showSnackBar('Removed from default watchlist');
+                        }
                       } else {
                         await provider.addToDefaultWatchlist(widget.movie);
-                        _showSnackBar('Added to default watchlist');
+                        if (mounted) {
+                          _showSnackBar('Added to default watchlist');
+                        }
                       }
                     } else if (value == 'add_to_list') {
                       _showWatchlistSelectionDialog();
@@ -226,7 +241,10 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                                 isInWatchlist
                                     ? Icons.bookmark_remove
                                     : Icons.bookmark_add,
-                                color: isInWatchlist ? Colors.red : Colors.blue,
+                                color:
+                                    isInWatchlist
+                                        ? Colors.red
+                                        : theme.colorScheme.primary,
                               ),
                               const SizedBox(width: 8),
                               Text(
@@ -235,19 +253,21 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                                     : 'Quick Add to Default Watchlist',
                                 style: TextStyle(
                                   color:
-                                      isInWatchlist ? Colors.red : Colors.blue,
+                                      isInWatchlist
+                                          ? Colors.red
+                                          : theme.colorScheme.primary,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'add_to_list',
                           child: Row(
                             children: [
                               Icon(Icons.playlist_add, color: Colors.green),
-                              SizedBox(width: 8),
-                              Text(
+                              const SizedBox(width: 8),
+                              const Text(
                                 'Add to Custom List',
                                 style: TextStyle(color: Colors.green),
                               ),
@@ -265,6 +285,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   Widget _buildHeroSection() {
+    final theme = Theme.of(context);
     return SliverAppBar(
       expandedHeight: 400,
       pinned: false,
@@ -292,30 +313,31 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                           fit: BoxFit.cover,
                           placeholder:
                               (context, url) => Container(
-                                color: Colors.grey[800],
-                                child: const Center(
+                                color: theme.cardTheme.color,
+                                child: Center(
                                   child: CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
+                                      theme.colorScheme.primary,
                                     ),
                                   ),
                                 ),
                               ),
                           errorWidget:
                               (context, url, error) => Container(
-                                color: Colors.grey[800],
-                                child: const Icon(
+                                color: theme.cardTheme.color,
+                                child: Icon(
                                   Icons.movie,
-                                  color: Colors.white54,
+                                  color: theme.colorScheme.onSurface
+                                      .withOpacity(0.5),
                                   size: 80,
                                 ),
                               ),
                         )
                         : Container(
-                          color: Colors.grey[800],
-                          child: const Icon(
+                          color: theme.cardTheme.color,
+                          child: Icon(
                             Icons.movie,
-                            color: Colors.white54,
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
                             size: 80,
                           ),
                         ),
@@ -345,13 +367,13 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                     children: [
                       Text(
                         widget.movie.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           shadows: [
                             Shadow(
-                              offset: Offset(0, 2),
+                              offset: const Offset(0, 2),
                               blurRadius: 4,
                               color: Colors.black54,
                             ),
@@ -370,7 +392,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                             const SizedBox(width: 4),
                             Text(
                               widget.movie.rating!.toStringAsFixed(1),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -379,8 +401,8 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                             const SizedBox(width: 8),
                             Text(
                               '(${widget.movie.rating!.toStringAsFixed(1)}/10)',
-                              style: const TextStyle(
-                                color: Colors.white70,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 14,
                               ),
                             ),
@@ -428,13 +450,14 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   Widget _buildCastSection() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Cast',
           style: TextStyle(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -445,7 +468,9 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             height: 110,
             child: Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  theme.colorScheme.primary,
+                ),
               ),
             ),
           )
@@ -455,7 +480,10 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             child: Center(
               child: Text(
                 'No cast information available',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  fontSize: 14,
+                ),
               ),
             ),
           )
@@ -474,7 +502,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                       Container(
                         width: 60,
                         height: 60,
-                        decoration: BoxDecoration(shape: BoxShape.circle),
+                        decoration: const BoxDecoration(shape: BoxShape.circle),
                         child: ClipOval(
                           child:
                               castMember.profileUrl.isNotEmpty
@@ -483,28 +511,31 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                                     fit: BoxFit.cover,
                                     placeholder:
                                         (context, url) => Container(
-                                          color: Colors.grey[800],
-                                          child: const Icon(
+                                          color: theme.cardTheme.color,
+                                          child: Icon(
                                             Icons.person,
-                                            color: Colors.white54,
+                                            color: theme.colorScheme.onSurface
+                                                .withOpacity(0.5),
                                             size: 30,
                                           ),
                                         ),
                                     errorWidget:
                                         (context, url, error) => Container(
-                                          color: Colors.grey[800],
-                                          child: const Icon(
+                                          color: theme.cardTheme.color,
+                                          child: Icon(
                                             Icons.person,
-                                            color: Colors.white54,
+                                            color: theme.colorScheme.onSurface
+                                                .withOpacity(0.5),
                                             size: 30,
                                           ),
                                         ),
                                   )
                                   : Container(
-                                    color: Colors.grey[800],
-                                    child: const Icon(
+                                    color: theme.cardTheme.color,
+                                    child: Icon(
                                       Icons.person,
-                                      color: Colors.white54,
+                                      color: theme.colorScheme.onSurface
+                                          .withOpacity(0.5),
                                       size: 30,
                                     ),
                                   ),
@@ -515,8 +546,8 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                         width: 60,
                         child: Text(
                           castMember.name,
-                          style: const TextStyle(
-                            color: Colors.white70,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -536,17 +567,25 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   Widget _buildMovieInfo() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.movie.releaseDate != null) ...[
           Row(
             children: [
-              const Icon(Icons.calendar_today, color: Colors.white70, size: 16),
+              Icon(
+                Icons.calendar_today,
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                size: 16,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Release Date: ${widget.movie.releaseDate}',
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -558,13 +597,14 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   Widget _buildOverview() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Overview',
           style: TextStyle(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -574,8 +614,8 @@ class _MovieDetailPageState extends State<MovieDetailPage>
           (widget.movie.overview?.isNotEmpty == true)
               ? (widget.movie.overview ?? 'No overview available.')
               : 'No overview available.',
-          style: const TextStyle(
-            color: Colors.white70,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
             fontSize: 15,
             height: 1.5,
           ),
@@ -585,13 +625,14 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   Widget _buildTrailerSection() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Trailer',
           style: TextStyle(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -601,12 +642,14 @@ class _MovieDetailPageState extends State<MovieDetailPage>
           Container(
             height: 200,
             decoration: BoxDecoration(
-              color: Colors.grey[800],
+              color: theme.cardTheme.color,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Center(
+            child: Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  theme.colorScheme.primary,
+                ),
               ),
             ),
           )
@@ -619,18 +662,25 @@ class _MovieDetailPageState extends State<MovieDetailPage>
           Container(
             height: 200,
             decoration: BoxDecoration(
-              color: Colors.grey[800],
+              color: theme.cardTheme.color,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Center(
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.video_library, color: Colors.white54, size: 48),
-                  SizedBox(height: 8),
+                  Icon(
+                    Icons.video_library,
+                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    size: 48,
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     'No trailer available',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
@@ -641,19 +691,20 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   Widget _buildAdditionalInfo() {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Additional Information',
             style: TextStyle(
-              color: Colors.white,
+              color: theme.colorScheme.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -674,6 +725,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   Widget _buildInfoRow(String label, String value) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -683,18 +735,24 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(color: Colors.white70, fontSize: 14),
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                fontSize: 14,
+              ),
             ),
           ),
-          const Text(
+          Text(
             ': ',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+              fontSize: 14,
+            ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -706,6 +764,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   void _showWatchlistSelectionDialog() {
+    final theme = Theme.of(context);
     final provider = context.read<MovieProvider>();
     final watchlists = provider.customWatchlists;
 
@@ -718,10 +777,10 @@ class _MovieDetailPageState extends State<MovieDetailPage>
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1C2128),
-            title: const Text(
+            backgroundColor: theme.cardTheme.color,
+            title: Text(
               'Add to Watchlist',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.colorScheme.onSurface),
             ),
             content: SizedBox(
               width: double.maxFinite,
@@ -740,15 +799,20 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                       isInWatchlist
                           ? Icons.check_circle
                           : Icons.radio_button_unchecked,
-                      color: isInWatchlist ? Colors.green : Colors.white70,
+                      color:
+                          isInWatchlist
+                              ? Colors.green
+                              : theme.colorScheme.onSurface.withOpacity(0.7),
                     ),
                     title: Text(
                       watchlist.name,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: theme.colorScheme.onSurface),
                     ),
                     subtitle: Text(
                       '${watchlist.movieCount} movies',
-                      style: const TextStyle(color: Colors.white70),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
                     ),
                     onTap: () async {
                       if (isInWatchlist) {
@@ -756,15 +820,21 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                           watchlist.id,
                           widget.movie,
                         );
-                        _showSnackBar('Removed from ${watchlist.name}');
+                        if (mounted) {
+                          _showSnackBar('Removed from ${watchlist.name}');
+                        }
                       } else {
                         await provider.addMovieToWatchlist(
                           watchlist.id,
                           widget.movie,
                         );
-                        _showSnackBar('Added to ${watchlist.name}');
+                        if (mounted) {
+                          _showSnackBar('Added to ${watchlist.name}');
+                        }
                       }
-                      Navigator.pop(context);
+                      if (mounted) {
+                        Navigator.pop(context);
+                      }
                     },
                   );
                 },
@@ -773,9 +843,11 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
+                child: Text(
                   'Cancel',
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
               ),
               ElevatedButton(
@@ -791,6 +863,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   void _showCreateWatchlistDialog() {
+    final theme = Theme.of(context);
     final TextEditingController nameController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
 
@@ -798,42 +871,50 @@ class _MovieDetailPageState extends State<MovieDetailPage>
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1C2128),
-            title: const Text(
+            backgroundColor: theme.cardTheme.color,
+            title: Text(
               'Create New Watchlist',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.colorScheme.onSurface),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: theme.colorScheme.onSurface),
+                  decoration: InputDecoration(
                     labelText: 'Watchlist Name',
-                    labelStyle: TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                    border: const OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white30),
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.onSurface.withOpacity(0.3),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
+                      borderSide: BorderSide(color: theme.colorScheme.primary),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: descriptionController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: theme.colorScheme.onSurface),
+                  decoration: InputDecoration(
                     labelText: 'Description (Optional)',
-                    labelStyle: TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                    border: const OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white30),
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.onSurface.withOpacity(0.3),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
+                      borderSide: BorderSide(color: theme.colorScheme.primary),
                     ),
                   ),
                   maxLines: 2,
@@ -843,9 +924,11 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
+                child: Text(
                   'Cancel',
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
               ),
               ElevatedButton(
@@ -861,10 +944,12 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                       watchlist.id,
                       widget.movie,
                     );
-                    Navigator.pop(context);
-                    _showSnackBar(
-                      'Created "${watchlist.name}" and added movie',
-                    );
+                    if (mounted) {
+                      Navigator.pop(context);
+                      _showSnackBar(
+                        'Created "${watchlist.name}" and added movie',
+                      );
+                    }
                   }
                 },
                 child: const Text('Create & Add'),
@@ -875,10 +960,15 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   void _showSnackBar(String message) {
+    if (!mounted) return;
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.grey[800],
+        content: Text(
+          message,
+          style: TextStyle(color: theme.textTheme.titleLarge?.color),
+        ),
+        backgroundColor: theme.cardTheme.color,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),

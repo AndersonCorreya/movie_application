@@ -5,7 +5,15 @@ import 'package:movieapplication/View/widgets/movie_grid.dart';
 import 'package:movieapplication/View/movie_detail_page.dart';
 import 'package:movieapplication/Model/movie_model.dart';
 
-enum MovieCategory { popular, topRated, upcoming, action, comedy, horror }
+enum MovieCategory {
+  popular,
+  topRated,
+  upcoming,
+  action,
+  comedy,
+  horror,
+  nowPlaying,
+}
 
 class SeeAllPage extends StatefulWidget {
   final MovieCategory category;
@@ -58,6 +66,9 @@ class _SeeAllPageState extends State<SeeAllPage> {
       case MovieCategory.horror:
         provider.fetchAllHorrorMovies();
         break;
+      case MovieCategory.nowPlaying:
+        provider.fetchAllNowPlayingMovies();
+        break;
     }
   }
 
@@ -99,6 +110,10 @@ class _SeeAllPageState extends State<SeeAllPage> {
         hasMore = provider.hasMoreHorror;
         isLoading = provider.isLoadingMoreHorror;
         break;
+      case MovieCategory.nowPlaying:
+        hasMore = provider.hasMoreNowPlaying;
+        isLoading = provider.isLoadingMoreNowPlaying;
+        break;
     }
 
     print('LoadMoreData - HasMore: $hasMore, IsLoading: $isLoading');
@@ -124,6 +139,9 @@ class _SeeAllPageState extends State<SeeAllPage> {
         case MovieCategory.horror:
           provider.loadMoreHorrorMovies();
           break;
+        case MovieCategory.nowPlaying:
+          provider.loadMoreNowPlayingMovies();
+          break;
       }
     } else {
       print('Not loading more - HasMore: $hasMore, IsLoading: $isLoading');
@@ -145,6 +163,8 @@ class _SeeAllPageState extends State<SeeAllPage> {
         return provider.allComedyMovies;
       case MovieCategory.horror:
         return provider.allHorrorMovies;
+      case MovieCategory.nowPlaying:
+        return provider.allNowPlayingMovies;
     }
   }
 
@@ -163,6 +183,8 @@ class _SeeAllPageState extends State<SeeAllPage> {
         return provider.isLoadingMoreComedy;
       case MovieCategory.horror:
         return provider.isLoadingMoreHorror;
+      case MovieCategory.nowPlaying:
+        return provider.isLoadingMoreNowPlaying;
     }
   }
 
@@ -181,6 +203,8 @@ class _SeeAllPageState extends State<SeeAllPage> {
         return provider.hasMoreComedy;
       case MovieCategory.horror:
         return provider.hasMoreHorror;
+      case MovieCategory.nowPlaying:
+        return provider.hasMoreNowPlaying;
     }
   }
 

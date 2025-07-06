@@ -16,6 +16,7 @@ class MovieProvider extends ChangeNotifier {
   List<Movie> _actionMovies = [];
   List<Movie> _comedyMovies = [];
   List<Movie> _horrorMovies = [];
+  List<Movie> _nowPlayingMovies = [];
   List<Movie> _searchResults = [];
   List<Movie> _watchlist = [];
   List<Watchlist> _customWatchlists = [];
@@ -29,6 +30,7 @@ class MovieProvider extends ChangeNotifier {
   List<Movie> _allActionMovies = [];
   List<Movie> _allComedyMovies = [];
   List<Movie> _allHorrorMovies = [];
+  List<Movie> _allNowPlayingMovies = [];
 
   bool _isLoadingPopular = false;
   bool _isLoadingTopRated = false;
@@ -36,6 +38,7 @@ class MovieProvider extends ChangeNotifier {
   bool _isLoadingAction = false;
   bool _isLoadingComedy = false;
   bool _isLoadingHorror = false;
+  bool _isLoadingNowPlaying = false;
   bool _isSearching = false;
   bool _isLoadingMorePopular = false;
   bool _isLoadingMoreTopRated = false;
@@ -43,6 +46,7 @@ class MovieProvider extends ChangeNotifier {
   bool _isLoadingMoreAction = false;
   bool _isLoadingMoreComedy = false;
   bool _isLoadingMoreHorror = false;
+  bool _isLoadingMoreNowPlaying = false;
 
   String _errorMessage = '';
 
@@ -53,12 +57,14 @@ class MovieProvider extends ChangeNotifier {
   int _actionPage = 1;
   int _comedyPage = 1;
   int _horrorPage = 1;
+  int _nowPlayingPage = 1;
   bool _hasMorePopular = true;
   bool _hasMoreTopRated = true;
   bool _hasMoreUpcoming = true;
   bool _hasMoreAction = true;
   bool _hasMoreComedy = true;
   bool _hasMoreHorror = true;
+  bool _hasMoreNowPlaying = true;
 
   // Debouncer for search
   Timer? _searchDebouncer;
@@ -73,6 +79,7 @@ class MovieProvider extends ChangeNotifier {
   List<Movie> get actionMovies => _actionMovies;
   List<Movie> get comedyMovies => _comedyMovies;
   List<Movie> get horrorMovies => _horrorMovies;
+  List<Movie> get nowPlayingMovies => _nowPlayingMovies;
   List<Movie> get searchResults => _searchResults;
   List<Movie> get watchlist => _watchlist;
   List<Watchlist> get customWatchlists => _customWatchlists;
@@ -86,6 +93,7 @@ class MovieProvider extends ChangeNotifier {
   List<Movie> get allActionMovies => _allActionMovies;
   List<Movie> get allComedyMovies => _allComedyMovies;
   List<Movie> get allHorrorMovies => _allHorrorMovies;
+  List<Movie> get allNowPlayingMovies => _allNowPlayingMovies;
 
   bool get isLoadingPopular => _isLoadingPopular;
   bool get isLoadingTopRated => _isLoadingTopRated;
@@ -93,6 +101,7 @@ class MovieProvider extends ChangeNotifier {
   bool get isLoadingAction => _isLoadingAction;
   bool get isLoadingComedy => _isLoadingComedy;
   bool get isLoadingHorror => _isLoadingHorror;
+  bool get isLoadingNowPlaying => _isLoadingNowPlaying;
   bool get isSearching => _isSearching;
   bool get isLoadingMorePopular => _isLoadingMorePopular;
   bool get isLoadingMoreTopRated => _isLoadingMoreTopRated;
@@ -100,6 +109,7 @@ class MovieProvider extends ChangeNotifier {
   bool get isLoadingMoreAction => _isLoadingMoreAction;
   bool get isLoadingMoreComedy => _isLoadingMoreComedy;
   bool get isLoadingMoreHorror => _isLoadingMoreHorror;
+  bool get isLoadingMoreNowPlaying => _isLoadingMoreNowPlaying;
 
   String get errorMessage => _errorMessage;
 
@@ -110,6 +120,7 @@ class MovieProvider extends ChangeNotifier {
   bool get hasMoreAction => _hasMoreAction;
   bool get hasMoreComedy => _hasMoreComedy;
   bool get hasMoreHorror => _hasMoreHorror;
+  bool get hasMoreNowPlaying => _hasMoreNowPlaying;
 
   // API configuration from secrets
   final String _apiKey = Secrets.movieApiKey;
@@ -732,6 +743,90 @@ class MovieProvider extends ChangeNotifier {
     await _loadMoreHorrorMovies();
   }
 
+  // Fetch now playing movies (initial load - first page only)
+  Future<void> fetchNowPlayingMovies() async {
+    if (_isLoadingNowPlaying) return;
+
+    _isLoadingNowPlaying = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/movie/now_playing?api_key=$_apiKey&page=1'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        _nowPlayingMovies =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+      } else {
+        _errorMessage = 'Failed to load now playing movies';
+      }
+    } catch (e) {
+      _errorMessage = 'Network error: $e';
+    }
+
+    _isLoadingNowPlaying = false;
+    notifyListeners();
+  }
+
+  // Fetch all now playing movies for "See All" page
+  Future<void> fetchAllNowPlayingMovies() async {
+    _allNowPlayingMovies.clear();
+    _nowPlayingPage = 1;
+    _hasMoreNowPlaying = true;
+    await _loadMoreNowPlayingMovies();
+  }
+
+  // Load more now playing movies (pagination)
+  Future<void> _loadMoreNowPlayingMovies() async {
+    if (_isLoadingMoreNowPlaying) return;
+
+    _isLoadingMoreNowPlaying = true;
+    notifyListeners();
+
+    print('Loading now playing movies page $_nowPlayingPage');
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/movie/now_playing?api_key=$_apiKey&page=$_nowPlayingPage',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final newMovies =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+
+        _allNowPlayingMovies.addAll(newMovies);
+        _nowPlayingPage++;
+        _hasMoreNowPlaying = data['page'] < data['total_pages'];
+
+        print(
+          'Loaded ${newMovies.length} new now playing movies. Page: ${data['page']}, Total Pages: ${data['total_pages']}',
+        );
+      } else {
+        _errorMessage = 'Failed to load more now playing movies';
+      }
+    } catch (e) {
+      _errorMessage = 'Network error: $e';
+    }
+
+    _isLoadingMoreNowPlaying = false;
+    notifyListeners();
+  }
+
+  // Public method to load more now playing movies
+  Future<void> loadMoreNowPlayingMovies() async {
+    await _loadMoreNowPlayingMovies();
+  }
+
   // Search movies with debouncing
   void searchMovies(String query) {
     // Cancel previous timer if it exists
@@ -894,6 +989,7 @@ class MovieProvider extends ChangeNotifier {
       fetchActionMovies(),
       fetchComedyMovies(),
       fetchHorrorMovies(),
+      fetchNowPlayingMovies(),
     ]);
   }
 

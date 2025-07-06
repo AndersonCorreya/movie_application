@@ -271,6 +271,29 @@ class _MovieHomePageState extends State<MovieHomePage> {
               },
             ),
             const SizedBox(height: 8),
+            // In Theaters Now Section
+            Consumer<MovieProvider>(
+              builder: (context, provider, child) {
+                return MovieSection(
+                  title: 'In Theaters Now',
+                  movies: provider.nowPlayingMovies,
+                  isLoading: provider.isLoadingNowPlaying,
+                  onSeeAll: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const SeeAllPage(
+                              category: MovieCategory.nowPlaying,
+                              title: 'In Theaters Now',
+                            ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 8),
             // Upcoming Movies Section
             Consumer<MovieProvider>(
               builder: (context, provider, child) {
