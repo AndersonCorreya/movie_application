@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/View/widgets/movie_list.dart';
-import 'package:movieapplication/View/movie_detail_page.dart';
+import 'package:movieapplication/pages/widgets/movie_list.dart';
+import 'package:movieapplication/pages/movie_detail_page.dart';
 
 // Example usage in your home page
 class MovieSection extends StatelessWidget {

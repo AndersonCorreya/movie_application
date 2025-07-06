@@ -3,13 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/View/movie_detail_page.dart';
+import 'package:movieapplication/pages/movie_detail_page.dart';
 
 class MoviePosterCard extends StatelessWidget {
   final Movie movie;
   final double? width;
   final double? height;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final bool showRating;
   final bool showTitle;
   final String? heroTag;
@@ -20,6 +21,7 @@ class MoviePosterCard extends StatelessWidget {
     this.width = 120,
     this.height = 160,
     this.onTap,
+    this.onLongPress,
     this.showRating = false,
     this.showTitle = true,
     this.heroTag,
@@ -29,6 +31,7 @@ class MoviePosterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap ?? () => _navigateToDetail(context),
+      onLongPress: onLongPress,
       child: Container(
         width: width,
         margin: const EdgeInsets.symmetric(horizontal: 8),

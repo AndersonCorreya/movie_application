@@ -22,6 +22,7 @@ class MovieProvider extends ChangeNotifier {
   List<Watchlist> _customWatchlists = [];
   Map<int, List<CastMember>> _movieCast = {};
   Map<int, String?> _movieTrailers = {};
+  Map<int, List<Movie>> _recommendedMovies = {};
 
   // Pagination support for "See All" pages
   List<Movie> _allPopularMovies = [];
@@ -85,6 +86,7 @@ class MovieProvider extends ChangeNotifier {
   List<Watchlist> get customWatchlists => _customWatchlists;
   Map<int, List<CastMember>> get movieCast => _movieCast;
   Map<int, String?> get movieTrailers => _movieTrailers;
+  Map<int, List<Movie>> get recommendedMovies => _recommendedMovies;
 
   // "See All" page getters
   List<Movie> get allPopularMovies => _allPopularMovies;
@@ -978,6 +980,48 @@ class MovieProvider extends ChangeNotifier {
   // Get trailer for a movie (returns cached data if available)
   String? getMovieTrailer(int movieId) {
     return _movieTrailers[movieId];
+  }
+
+  // Fetch recommended movies for a specific movie
+  Future<List<Movie>> fetchRecommendedMovies(int movieId) async {
+    // Return cached recommendations if available
+    if (_recommendedMovies.containsKey(movieId)) {
+      return _recommendedMovies[movieId]!;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/movie/$movieId/recommendations?api_key=$_apiKey&page=1',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final recommendedList =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+
+        // Limit to top 10 recommendations
+        final topRecommendations = recommendedList.take(10).toList();
+
+        // Cache the recommendations
+        _recommendedMovies[movieId] = topRecommendations;
+
+        return topRecommendations;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching recommended movies: $e');
+      return [];
+    }
+  }
+
+  // Get recommended movies for a movie (returns cached data if available)
+  List<Movie> getRecommendedMovies(int movieId) {
+    return _recommendedMovies[movieId] ?? [];
   }
 
   // Load all initial data

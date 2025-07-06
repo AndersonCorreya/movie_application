@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:movieapplication/ViewModel/movie_provider.dart';
+import 'package:movieapplication/providers/movie_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/View/home_page.dart';
+import 'package:movieapplication/pages/home_page.dart';
 import 'package:movieapplication/core/theme/theme_provider.dart';
 
 void main() async {

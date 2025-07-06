@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/ViewModel/movie_provider.dart';
+import 'package:movieapplication/providers/movie_provider.dart';
 import 'package:movieapplication/Model/watchlist_model.dart';
-import 'package:movieapplication/View/widgets/movie_grid.dart';
-import 'package:movieapplication/View/movie_detail_page.dart';
+import 'package:movieapplication/Model/movie_model.dart';
+import 'package:movieapplication/pages/widgets/movie_grid.dart';
+import 'package:movieapplication/pages/movie_detail_page.dart';
 
 class WatchlistPage extends StatefulWidget {
   const WatchlistPage({Key? key}) : super(key: key);
@@ -633,6 +634,51 @@ class WatchlistDetailPage extends StatelessWidget {
   const WatchlistDetailPage({Key? key, required this.watchlist})
     : super(key: key);
 
+  void _showRemoveMovieDialog(BuildContext context, Movie movie) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1C2128),
+            title: const Text(
+              'Remove Movie',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: Text(
+              'Are you sure you want to remove "${movie.title}" from this watchlist?',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await context.read<MovieProvider>().removeMovieFromWatchlist(
+                    watchlist.id,
+                    movie,
+                  );
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: Text(
+                  'Remove',
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -672,8 +718,20 @@ class WatchlistDetailPage extends StatelessWidget {
             ),
         ],
       ),
-      body:
-          watchlist.movies.isEmpty
+      body: Consumer<MovieProvider>(
+        builder: (context, provider, child) {
+          // Get the updated watchlist from the provider
+          final updatedWatchlist =
+              provider.getDefaultWatchlist()?.id == watchlist.id
+                  ? provider.getDefaultWatchlist()
+                  : provider.customWatchlists.firstWhere(
+                    (w) => w.id == watchlist.id,
+                    orElse: () => watchlist,
+                  );
+
+          final currentWatchlist = updatedWatchlist ?? watchlist;
+
+          return currentWatchlist.movies.isEmpty
               ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -702,8 +760,8 @@ class WatchlistDetailPage extends StatelessWidget {
                 ),
               )
               : MovieGrid(
-                movies: watchlist.movies,
-                heroTagPrefix: 'watchlist_${watchlist.id}',
+                movies: currentWatchlist.movies,
+                heroTagPrefix: 'watchlist_${currentWatchlist.id}',
                 onMovieTap: (movie) {
                   Navigator.push(
                     context,
@@ -712,12 +770,16 @@ class WatchlistDetailPage extends StatelessWidget {
                           (context) => MovieDetailPage(
                             movie: movie,
                             heroTag:
-                                'watchlist_${watchlist.id}_movie_poster_${movie.id}',
+                                'watchlist_${currentWatchlist.id}_movie_poster_${movie.id}',
                           ),
                     ),
                   );
                 },
-              ),
+                onMovieLongPress:
+                    (movie) => _showRemoveMovieDialog(context, movie),
+              );
+        },
+      ),
     );
   }
 }

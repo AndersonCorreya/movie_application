@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/View/widgets/movie_poster_card.dart';
+import 'package:movieapplication/pages/widgets/movie_poster_card.dart';
 
 class MovieGrid extends StatelessWidget {
   final List<Movie> movies;
   final Function(Movie)? onMovieTap;
+  final Function(Movie)? onMovieLongPress;
   final bool isLoading;
   final bool showRating;
   final String? heroTagPrefix;
@@ -14,6 +15,7 @@ class MovieGrid extends StatelessWidget {
     Key? key,
     required this.movies,
     this.onMovieTap,
+    this.onMovieLongPress,
     this.isLoading = false,
     this.showRating = true,
     this.heroTagPrefix,
@@ -49,6 +51,8 @@ class MovieGrid extends StatelessWidget {
           height: 200,
           showRating: showRating,
           onTap: onMovieTap != null ? () => onMovieTap!(movie) : null,
+          onLongPress:
+              onMovieLongPress != null ? () => onMovieLongPress!(movie) : null,
           heroTag:
               heroTagPrefix != null
                   ? '${heroTagPrefix}_movie_poster_${movie.id}'

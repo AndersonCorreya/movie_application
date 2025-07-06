@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/View/widgets/movie_poster_card.dart';
+import 'package:movieapplication/pages/widgets/movie_poster_card.dart';
 
 // Movie list component for horizontal scrolling
 class MovieList extends StatelessWidget {
