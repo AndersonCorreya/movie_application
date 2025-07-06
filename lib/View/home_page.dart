@@ -98,7 +98,7 @@ class _MovieHomePageState extends State<MovieHomePage> {
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          fontFamily: 'WorkSans',
+          fontFamily: 'Helvetica',
         ),
       ),
       body: IndexedStack(
@@ -158,6 +158,75 @@ class _MovieHomePageState extends State<MovieHomePage> {
                             (context) => const SeeAllPage(
                               category: MovieCategory.topRated,
                               title: 'Top Rated Movies',
+                            ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            // Action Movies Section
+            Consumer<MovieProvider>(
+              builder: (context, provider, child) {
+                return MovieSection(
+                  title: 'Action',
+                  movies: provider.actionMovies,
+                  isLoading: provider.isLoadingAction,
+                  onSeeAll: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const SeeAllPage(
+                              category: MovieCategory.action,
+                              title: 'Action Movies',
+                            ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            // Comedy Movies Section
+            Consumer<MovieProvider>(
+              builder: (context, provider, child) {
+                return MovieSection(
+                  title: 'Comedy',
+                  movies: provider.comedyMovies,
+                  isLoading: provider.isLoadingComedy,
+                  onSeeAll: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const SeeAllPage(
+                              category: MovieCategory.comedy,
+                              title: 'Comedy Movies',
+                            ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            // Horror Movies Section
+            Consumer<MovieProvider>(
+              builder: (context, provider, child) {
+                return MovieSection(
+                  title: 'Horror',
+                  movies: provider.horrorMovies,
+                  isLoading: provider.isLoadingHorror,
+                  onSeeAll: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => const SeeAllPage(
+                              category: MovieCategory.horror,
+                              title: 'Horror Movies',
                             ),
                       ),
                     );

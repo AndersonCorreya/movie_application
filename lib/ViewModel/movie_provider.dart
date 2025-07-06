@@ -13,23 +13,36 @@ class MovieProvider extends ChangeNotifier {
   List<Movie> _popularMovies = [];
   List<Movie> _topRatedMovies = [];
   List<Movie> _upcomingMovies = [];
+  List<Movie> _actionMovies = [];
+  List<Movie> _comedyMovies = [];
+  List<Movie> _horrorMovies = [];
   List<Movie> _searchResults = [];
   List<Movie> _watchlist = [];
   List<Watchlist> _customWatchlists = [];
   Map<int, List<CastMember>> _movieCast = {};
+  Map<int, String?> _movieTrailers = {};
 
   // Pagination support for "See All" pages
   List<Movie> _allPopularMovies = [];
   List<Movie> _allTopRatedMovies = [];
   List<Movie> _allUpcomingMovies = [];
+  List<Movie> _allActionMovies = [];
+  List<Movie> _allComedyMovies = [];
+  List<Movie> _allHorrorMovies = [];
 
   bool _isLoadingPopular = false;
   bool _isLoadingTopRated = false;
   bool _isLoadingUpcoming = false;
+  bool _isLoadingAction = false;
+  bool _isLoadingComedy = false;
+  bool _isLoadingHorror = false;
   bool _isSearching = false;
   bool _isLoadingMorePopular = false;
   bool _isLoadingMoreTopRated = false;
   bool _isLoadingMoreUpcoming = false;
+  bool _isLoadingMoreAction = false;
+  bool _isLoadingMoreComedy = false;
+  bool _isLoadingMoreHorror = false;
 
   String _errorMessage = '';
 
@@ -37,9 +50,15 @@ class MovieProvider extends ChangeNotifier {
   int _popularPage = 1;
   int _topRatedPage = 1;
   int _upcomingPage = 1;
+  int _actionPage = 1;
+  int _comedyPage = 1;
+  int _horrorPage = 1;
   bool _hasMorePopular = true;
   bool _hasMoreTopRated = true;
   bool _hasMoreUpcoming = true;
+  bool _hasMoreAction = true;
+  bool _hasMoreComedy = true;
+  bool _hasMoreHorror = true;
 
   // Debouncer for search
   Timer? _searchDebouncer;
@@ -51,23 +70,36 @@ class MovieProvider extends ChangeNotifier {
   List<Movie> get popularMovies => _popularMovies;
   List<Movie> get topRatedMovies => _topRatedMovies;
   List<Movie> get upcomingMovies => _upcomingMovies;
+  List<Movie> get actionMovies => _actionMovies;
+  List<Movie> get comedyMovies => _comedyMovies;
+  List<Movie> get horrorMovies => _horrorMovies;
   List<Movie> get searchResults => _searchResults;
   List<Movie> get watchlist => _watchlist;
   List<Watchlist> get customWatchlists => _customWatchlists;
   Map<int, List<CastMember>> get movieCast => _movieCast;
+  Map<int, String?> get movieTrailers => _movieTrailers;
 
   // "See All" page getters
   List<Movie> get allPopularMovies => _allPopularMovies;
   List<Movie> get allTopRatedMovies => _allTopRatedMovies;
   List<Movie> get allUpcomingMovies => _allUpcomingMovies;
+  List<Movie> get allActionMovies => _allActionMovies;
+  List<Movie> get allComedyMovies => _allComedyMovies;
+  List<Movie> get allHorrorMovies => _allHorrorMovies;
 
   bool get isLoadingPopular => _isLoadingPopular;
   bool get isLoadingTopRated => _isLoadingTopRated;
   bool get isLoadingUpcoming => _isLoadingUpcoming;
+  bool get isLoadingAction => _isLoadingAction;
+  bool get isLoadingComedy => _isLoadingComedy;
+  bool get isLoadingHorror => _isLoadingHorror;
   bool get isSearching => _isSearching;
   bool get isLoadingMorePopular => _isLoadingMorePopular;
   bool get isLoadingMoreTopRated => _isLoadingMoreTopRated;
   bool get isLoadingMoreUpcoming => _isLoadingMoreUpcoming;
+  bool get isLoadingMoreAction => _isLoadingMoreAction;
+  bool get isLoadingMoreComedy => _isLoadingMoreComedy;
+  bool get isLoadingMoreHorror => _isLoadingMoreHorror;
 
   String get errorMessage => _errorMessage;
 
@@ -75,6 +107,9 @@ class MovieProvider extends ChangeNotifier {
   bool get hasMorePopular => _hasMorePopular;
   bool get hasMoreTopRated => _hasMoreTopRated;
   bool get hasMoreUpcoming => _hasMoreUpcoming;
+  bool get hasMoreAction => _hasMoreAction;
+  bool get hasMoreComedy => _hasMoreComedy;
+  bool get hasMoreHorror => _hasMoreHorror;
 
   // API configuration from secrets
   final String _apiKey = Secrets.movieApiKey;
@@ -88,8 +123,19 @@ class MovieProvider extends ChangeNotifier {
 
   // Load custom watchlists from storage
   Future<void> loadCustomWatchlists() async {
-    _customWatchlists = _watchlistService.getAllWatchlists();
+    // Only include non-default watchlists
+    _customWatchlists = _watchlistService.getCustomWatchlists();
     notifyListeners();
+  }
+
+  // Get the default watchlist
+  Watchlist? getDefaultWatchlist() {
+    return _watchlistService.getDefaultWatchlist();
+  }
+
+  // Get all custom watchlists (excluding default)
+  List<Watchlist> getCustomWatchlistsOnly() {
+    return _watchlistService.getCustomWatchlists();
   }
 
   // Create a new custom watchlist
@@ -172,6 +218,29 @@ class MovieProvider extends ChangeNotifier {
 
   bool isInWatchlist(Movie movie) {
     return _watchlist.any((m) => m.id == movie.id);
+  }
+
+  // Default watchlist methods
+  Future<void> addToDefaultWatchlist(Movie movie) async {
+    final defaultWatchlist = getDefaultWatchlist();
+    if (defaultWatchlist != null) {
+      await addMovieToWatchlist(defaultWatchlist.id, movie);
+    }
+  }
+
+  Future<void> removeFromDefaultWatchlist(Movie movie) async {
+    final defaultWatchlist = getDefaultWatchlist();
+    if (defaultWatchlist != null) {
+      await removeMovieFromWatchlist(defaultWatchlist.id, movie);
+    }
+  }
+
+  bool isInDefaultWatchlist(Movie movie) {
+    final defaultWatchlist = getDefaultWatchlist();
+    if (defaultWatchlist != null) {
+      return isMovieInWatchlist(defaultWatchlist.id, movie);
+    }
+    return false;
   }
 
   // Fetch popular movies (initial load - first page only)
@@ -417,6 +486,246 @@ class MovieProvider extends ChangeNotifier {
     await _loadMoreUpcomingMovies();
   }
 
+  // Fetch action movies (initial load - first page only)
+  Future<void> fetchActionMovies() async {
+    _isLoadingAction = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/discover/movie?api_key=$_apiKey&with_genres=28&page=1',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        _actionMovies =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+        _actionPage = 1;
+        _hasMoreAction = data['page'] < data['total_pages'];
+      } else {
+        _errorMessage = 'Failed to load action movies';
+      }
+    } catch (e) {
+      _errorMessage = 'Network error: $e';
+    }
+
+    _isLoadingAction = false;
+    notifyListeners();
+  }
+
+  // Fetch all action movies for "See All" page
+  Future<void> fetchAllActionMovies() async {
+    _allActionMovies = [];
+    _actionPage = 1;
+    _hasMoreAction = true;
+    await _loadMoreActionMovies();
+  }
+
+  // Load more action movies (pagination)
+  Future<void> _loadMoreActionMovies() async {
+    if (!_hasMoreAction || _isLoadingMoreAction) return;
+
+    _isLoadingMoreAction = true;
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/discover/movie?api_key=$_apiKey&with_genres=28&page=$_actionPage',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final newMovies =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+
+        _allActionMovies.addAll(newMovies);
+        _actionPage++;
+        _hasMoreAction = data['page'] < data['total_pages'];
+      } else {
+        _errorMessage = 'Failed to load more action movies';
+      }
+    } catch (e) {
+      _errorMessage = 'Network error: $e';
+    }
+
+    _isLoadingMoreAction = false;
+    notifyListeners();
+  }
+
+  // Public method to load more action movies
+  Future<void> loadMoreActionMovies() async {
+    await _loadMoreActionMovies();
+  }
+
+  // Fetch comedy movies (initial load - first page only)
+  Future<void> fetchComedyMovies() async {
+    _isLoadingComedy = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/discover/movie?api_key=$_apiKey&with_genres=35&page=1',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        _comedyMovies =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+        _comedyPage = 1;
+        _hasMoreComedy = data['page'] < data['total_pages'];
+      } else {
+        _errorMessage = 'Failed to load comedy movies';
+      }
+    } catch (e) {
+      _errorMessage = 'Network error: $e';
+    }
+
+    _isLoadingComedy = false;
+    notifyListeners();
+  }
+
+  // Fetch all comedy movies for "See All" page
+  Future<void> fetchAllComedyMovies() async {
+    _allComedyMovies = [];
+    _comedyPage = 1;
+    _hasMoreComedy = true;
+    await _loadMoreComedyMovies();
+  }
+
+  // Load more comedy movies (pagination)
+  Future<void> _loadMoreComedyMovies() async {
+    if (!_hasMoreComedy || _isLoadingMoreComedy) return;
+
+    _isLoadingMoreComedy = true;
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/discover/movie?api_key=$_apiKey&with_genres=35&page=$_comedyPage',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final newMovies =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+
+        _allComedyMovies.addAll(newMovies);
+        _comedyPage++;
+        _hasMoreComedy = data['page'] < data['total_pages'];
+      } else {
+        _errorMessage = 'Failed to load more comedy movies';
+      }
+    } catch (e) {
+      _errorMessage = 'Network error: $e';
+    }
+
+    _isLoadingMoreComedy = false;
+    notifyListeners();
+  }
+
+  // Public method to load more comedy movies
+  Future<void> loadMoreComedyMovies() async {
+    await _loadMoreComedyMovies();
+  }
+
+  // Fetch horror movies (initial load - first page only)
+  Future<void> fetchHorrorMovies() async {
+    _isLoadingHorror = true;
+    _errorMessage = '';
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/discover/movie?api_key=$_apiKey&with_genres=27&page=1',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        _horrorMovies =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+        _horrorPage = 1;
+        _hasMoreHorror = data['page'] < data['total_pages'];
+      } else {
+        _errorMessage = 'Failed to load horror movies';
+      }
+    } catch (e) {
+      _errorMessage = 'Network error: $e';
+    }
+
+    _isLoadingHorror = false;
+    notifyListeners();
+  }
+
+  // Fetch all horror movies for "See All" page
+  Future<void> fetchAllHorrorMovies() async {
+    _allHorrorMovies = [];
+    _horrorPage = 1;
+    _hasMoreHorror = true;
+    await _loadMoreHorrorMovies();
+  }
+
+  // Load more horror movies (pagination)
+  Future<void> _loadMoreHorrorMovies() async {
+    if (!_hasMoreHorror || _isLoadingMoreHorror) return;
+
+    _isLoadingMoreHorror = true;
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$_baseUrl/discover/movie?api_key=$_apiKey&with_genres=27&page=$_horrorPage',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final newMovies =
+            (data['results'] as List)
+                .map((movie) => Movie.fromJson(movie))
+                .toList();
+
+        _allHorrorMovies.addAll(newMovies);
+        _horrorPage++;
+        _hasMoreHorror = data['page'] < data['total_pages'];
+      } else {
+        _errorMessage = 'Failed to load more horror movies';
+      }
+    } catch (e) {
+      _errorMessage = 'Network error: $e';
+    }
+
+    _isLoadingMoreHorror = false;
+    notifyListeners();
+  }
+
+  // Public method to load more horror movies
+  Future<void> loadMoreHorrorMovies() async {
+    await _loadMoreHorrorMovies();
+  }
+
   // Search movies with debouncing
   void searchMovies(String query) {
     // Cancel previous timer if it exists
@@ -510,12 +819,75 @@ class MovieProvider extends ChangeNotifier {
     return _movieCast[movieId] ?? [];
   }
 
+  // Fetch trailer for a specific movie
+  Future<String?> fetchMovieTrailer(int movieId) async {
+    // Return cached trailer if available
+    if (_movieTrailers.containsKey(movieId)) {
+      return _movieTrailers[movieId];
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/movie/$movieId/videos?api_key=$_apiKey'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final videos = data['results'] as List;
+
+        // Find the first official trailer
+        final trailer = videos.firstWhere(
+          (video) =>
+              video['type'] == 'Trailer' &&
+              video['site'] == 'YouTube' &&
+              video['official'] == true,
+          orElse: () => null,
+        );
+
+        if (trailer != null) {
+          final trailerKey = trailer['key'];
+          _movieTrailers[movieId] = trailerKey;
+          return trailerKey;
+        }
+
+        // If no official trailer, try to find any trailer
+        final anyTrailer = videos.firstWhere(
+          (video) => video['type'] == 'Trailer' && video['site'] == 'YouTube',
+          orElse: () => null,
+        );
+
+        if (anyTrailer != null) {
+          final trailerKey = anyTrailer['key'];
+          _movieTrailers[movieId] = trailerKey;
+          return trailerKey;
+        }
+
+        // Cache null if no trailer found
+        _movieTrailers[movieId] = null;
+        return null;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching trailer: $e');
+      return null;
+    }
+  }
+
+  // Get trailer for a movie (returns cached data if available)
+  String? getMovieTrailer(int movieId) {
+    return _movieTrailers[movieId];
+  }
+
   // Load all initial data
   Future<void> loadInitialData() async {
     await Future.wait([
       fetchPopularMovies(),
       fetchTopRatedMovies(),
       fetchUpcomingMovies(),
+      fetchActionMovies(),
+      fetchComedyMovies(),
+      fetchHorrorMovies(),
     ]);
   }
 

@@ -71,7 +71,7 @@ class _WatchlistPageState extends State<WatchlistPage> {
                       borderSide: BorderSide(color: Colors.blue),
                     ),
                   ),
-                  maxLines: 2,
+                  maxLines: 4,
                 ),
               ],
             ),
@@ -178,6 +178,16 @@ class _WatchlistPageState extends State<WatchlistPage> {
   }
 
   void _showDeleteConfirmation(Watchlist watchlist) {
+    if (watchlist.isDefaultWatchlist) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('The default watchlist cannot be deleted'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder:
@@ -285,7 +295,10 @@ class _WatchlistPageState extends State<WatchlistPage> {
       ),
       body: Consumer<MovieProvider>(
         builder: (context, provider, child) {
-          if (provider.customWatchlists.isEmpty) {
+          final defaultWatchlist = provider.getDefaultWatchlist();
+          final customWatchlists = provider.getCustomWatchlistsOnly();
+
+          if (defaultWatchlist == null && customWatchlists.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -323,9 +336,21 @@ class _WatchlistPageState extends State<WatchlistPage> {
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: provider.customWatchlists.length,
+            itemCount:
+                (defaultWatchlist != null ? 1 : 0) + customWatchlists.length,
             itemBuilder: (context, index) {
-              final watchlist = provider.customWatchlists[index];
+              Watchlist watchlist;
+              bool isDefault = false;
+
+              if (index == 0 && defaultWatchlist != null) {
+                watchlist = defaultWatchlist;
+                isDefault = true;
+              } else {
+                final customIndex =
+                    defaultWatchlist != null ? index - 1 : index;
+                watchlist = customWatchlists[customIndex];
+                isDefault = false;
+              }
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
                 child: InkWell(
@@ -344,31 +369,125 @@ class _WatchlistPageState extends State<WatchlistPage> {
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
+                        // Watchlist icon - shows first movie poster if available, otherwise shows bookmark icon
                         Container(
                           width: 60,
                           height: 60,
                           decoration: BoxDecoration(
-                            color: Colors.blue.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
+                            color:
+                                watchlist.movies.isNotEmpty
+                                    ? Colors.transparent
+                                    : Colors.blue.withValues(alpha: 0.2),
                           ),
-                          child: Icon(
-                            Icons.bookmark,
-                            color: Colors.blue,
-                            size: 28,
-                          ),
+                          child:
+                              watchlist.movies.isNotEmpty
+                                  ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      watchlist.movies.first.posterUrl,
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (
+                                        context,
+                                        child,
+                                        loadingProgress,
+                                      ) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: const Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                    Colors.blue,
+                                                  ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.bookmark,
+                                            color: Colors.blue,
+                                            size: 28,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  )
+                                  : const Icon(
+                                    Icons.bookmark,
+                                    color: Colors.blue,
+                                    size: 28,
+                                  ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                watchlist.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    watchlist.name,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  if (isDefault) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: Colors.blue,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Default',
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                               if (watchlist.description.isNotEmpty) ...[
                                 const SizedBox(height: 4),
@@ -420,19 +539,20 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                     ],
                                   ),
                                 ),
-                                const PopupMenuItem(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.delete, color: Colors.red),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ],
+                                if (!isDefault) // Only show delete option for non-default watchlists
+                                  const PopupMenuItem(
+                                    value: 'delete',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.delete, color: Colors.red),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
                               ],
                         ),
                       ],
@@ -460,35 +580,37 @@ class WatchlistDetailPage extends StatelessWidget {
       backgroundColor: scaffoldColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(watchlist.name),
+        title: Text(watchlist.name, style: TextStyle(fontFamily: 'Mulish')),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) {
-              if (value == 'delete') {
-                context.read<MovieProvider>().deleteCustomWatchlist(
-                  watchlist.id,
-                );
-                Navigator.pop(context);
-              }
-            },
-            itemBuilder:
-                (context) => [
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text(
-                          'Delete Watchlist',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ],
+          if (!watchlist
+              .isDefaultWatchlist) // Only show delete option for non-default watchlists
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (value) {
+                if (value == 'delete') {
+                  context.read<MovieProvider>().deleteCustomWatchlist(
+                    watchlist.id,
+                  );
+                  Navigator.pop(context);
+                }
+              },
+              itemBuilder:
+                  (context) => [
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text(
+                            'Delete Watchlist',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-          ),
+                  ],
+            ),
         ],
       ),
       body:

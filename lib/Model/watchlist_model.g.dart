@@ -22,13 +22,14 @@ class WatchlistAdapter extends TypeAdapter<Watchlist> {
       description: fields[2] as String,
       createdAt: fields[3] as DateTime?,
       movies: (fields[4] as List?)?.cast<Movie>(),
+      isDefault: fields[5] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Watchlist obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class WatchlistAdapter extends TypeAdapter<Watchlist> {
       ..writeByte(3)
       ..write(obj.createdAt)
       ..writeByte(4)
-      ..write(obj.movies);
+      ..write(obj.movies)
+      ..writeByte(5)
+      ..write(obj.isDefault);
   }
 
   @override

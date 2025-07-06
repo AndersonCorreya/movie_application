@@ -63,15 +63,7 @@ class MoviePosterCard extends StatelessWidget {
                                 (context, url) => Container(
                                   width: double.infinity,
                                   height: double.infinity,
-                                  color: Colors.grey[800],
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  ),
+                                  color: Colors.transparent,
                                 ),
                             errorWidget:
                                 (context, url, error) => Container(

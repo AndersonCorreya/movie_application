@@ -40,6 +40,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:
@@ -93,6 +94,9 @@ flutter:
     - family: Mulish
       fonts:
         - asset: assets/fonts/Mulish-Regular.ttf
+    - family: Helvetica   
+      fonts:
+        - asset: assets/fonts/Helvetica-Bold.ttf
 
   #
   # For details regarding fonts from package dependencies,

@@ -48,5 +48,5 @@ app.*.map.json
 .env
 .env.local
 .env.production
-config/secrets.dart
-lib/config/secrets.dart
+# config/secrets.dart
+# lib/config/secrets.dart

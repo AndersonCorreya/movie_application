@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:movieapplication/Model/movie_model.dart';
 import 'package:movieapplication/Model/cast_model.dart';
 import 'package:movieapplication/ViewModel/movie_provider.dart';
+import 'package:movieapplication/View/widgets/youtube_trailer_widget.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final Movie movie;
@@ -29,6 +30,8 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   double _scrollOffset = 0;
   List<CastMember> _castMembers = [];
   bool _isLoadingCast = false;
+  String? _trailerVideoId;
+  bool _isLoadingTrailer = false;
 
   @override
   void initState() {
@@ -36,6 +39,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
     _initializeAnimations();
     _setupScrollController();
     _loadCastData();
+    _loadTrailerData();
   }
 
   void _initializeAnimations() {
@@ -71,6 +75,28 @@ class _MovieDetailPageState extends State<MovieDetailPage>
         _isAppBarVisible = _scrollOffset < 200;
       });
     });
+  }
+
+  Future<void> _loadTrailerData() async {
+    if (_trailerVideoId != null) return; // Already loaded
+
+    setState(() {
+      _isLoadingTrailer = true;
+    });
+
+    try {
+      final provider = context.read<MovieProvider>();
+      final trailerId = await provider.fetchMovieTrailer(widget.movie.id);
+
+      setState(() {
+        _trailerVideoId = trailerId;
+        _isLoadingTrailer = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingTrailer = false;
+      });
+    }
   }
 
   Future<void> _loadCastData() async {
@@ -168,21 +194,23 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             ),
             child: Consumer<MovieProvider>(
               builder: (context, provider, child) {
-                final isInWatchlist = provider.isInWatchlist(widget.movie);
+                final isInWatchlist = provider.isInDefaultWatchlist(
+                  widget.movie,
+                );
                 return PopupMenuButton<String>(
                   icon: Icon(
                     isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
                     color: isInWatchlist ? Colors.amber : Colors.white,
                   ),
-                  onSelected: (value) {
+                  onSelected: (value) async {
                     HapticFeedback.lightImpact();
                     if (value == 'quick_add') {
                       if (isInWatchlist) {
-                        provider.removeFromWatchlist(widget.movie);
-                        _showSnackBar('Removed from watchlist');
+                        await provider.removeFromDefaultWatchlist(widget.movie);
+                        _showSnackBar('Removed from default watchlist');
                       } else {
-                        provider.addToWatchlist(widget.movie);
-                        _showSnackBar('Added to watchlist');
+                        await provider.addToDefaultWatchlist(widget.movie);
+                        _showSnackBar('Added to default watchlist');
                       }
                     } else if (value == 'add_to_list') {
                       _showWatchlistSelectionDialog();
@@ -203,8 +231,8 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                               const SizedBox(width: 8),
                               Text(
                                 isInWatchlist
-                                    ? 'Remove from Watchlist'
-                                    : 'Quick Add to Watchlist',
+                                    ? 'Remove from Default Watchlist'
+                                    : 'Quick Add to Default Watchlist',
                                 style: TextStyle(
                                   color:
                                       isInWatchlist ? Colors.red : Colors.blue,
@@ -387,6 +415,8 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                   const SizedBox(height: 24),
                   _buildOverview(),
                   const SizedBox(height: 24),
+                  _buildTrailerSection(),
+                  const SizedBox(height: 24),
                   _buildAdditionalInfo(),
                 ],
               ),
@@ -550,6 +580,62 @@ class _MovieDetailPageState extends State<MovieDetailPage>
             height: 1.5,
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildTrailerSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Trailer',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+        if (_isLoadingTrailer)
+          Container(
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[800],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          )
+        else if (_trailerVideoId != null)
+          YouTubeTrailerWidget(
+            videoId: _trailerVideoId!,
+            movieTitle: widget.movie.title,
+          )
+        else
+          Container(
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.grey[800],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.video_library, color: Colors.white54, size: 48),
+                  SizedBox(height: 8),
+                  Text(
+                    'No trailer available',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }

@@ -48,8 +48,11 @@ class MovieList extends StatelessWidget {
               movies.isEmpty
                   ? const Center(
                     child: Text(
-                      'No movies available',
-                      style: TextStyle(color: Colors.white70),
+                      'Refresh to load movies',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontFamily: 'WorkSans',
+                      ),
                     ),
                   )
                   : ListView.builder(

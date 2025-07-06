@@ -5,7 +5,7 @@ import 'package:movieapplication/View/widgets/movie_grid.dart';
 import 'package:movieapplication/View/movie_detail_page.dart';
 import 'package:movieapplication/Model/movie_model.dart';
 
-enum MovieCategory { popular, topRated, upcoming }
+enum MovieCategory { popular, topRated, upcoming, action, comedy, horror }
 
 class SeeAllPage extends StatefulWidget {
   final MovieCategory category;
@@ -49,6 +49,15 @@ class _SeeAllPageState extends State<SeeAllPage> {
       case MovieCategory.upcoming:
         provider.fetchAllUpcomingMovies();
         break;
+      case MovieCategory.action:
+        provider.fetchAllActionMovies();
+        break;
+      case MovieCategory.comedy:
+        provider.fetchAllComedyMovies();
+        break;
+      case MovieCategory.horror:
+        provider.fetchAllHorrorMovies();
+        break;
     }
   }
 
@@ -78,6 +87,18 @@ class _SeeAllPageState extends State<SeeAllPage> {
         hasMore = provider.hasMoreUpcoming;
         isLoading = provider.isLoadingMoreUpcoming;
         break;
+      case MovieCategory.action:
+        hasMore = provider.hasMoreAction;
+        isLoading = provider.isLoadingMoreAction;
+        break;
+      case MovieCategory.comedy:
+        hasMore = provider.hasMoreComedy;
+        isLoading = provider.isLoadingMoreComedy;
+        break;
+      case MovieCategory.horror:
+        hasMore = provider.hasMoreHorror;
+        isLoading = provider.isLoadingMoreHorror;
+        break;
     }
 
     print('LoadMoreData - HasMore: $hasMore, IsLoading: $isLoading');
@@ -94,6 +115,15 @@ class _SeeAllPageState extends State<SeeAllPage> {
         case MovieCategory.upcoming:
           provider.loadMoreUpcomingMovies();
           break;
+        case MovieCategory.action:
+          provider.loadMoreActionMovies();
+          break;
+        case MovieCategory.comedy:
+          provider.loadMoreComedyMovies();
+          break;
+        case MovieCategory.horror:
+          provider.loadMoreHorrorMovies();
+          break;
       }
     } else {
       print('Not loading more - HasMore: $hasMore, IsLoading: $isLoading');
@@ -109,6 +139,12 @@ class _SeeAllPageState extends State<SeeAllPage> {
         return provider.allTopRatedMovies;
       case MovieCategory.upcoming:
         return provider.allUpcomingMovies;
+      case MovieCategory.action:
+        return provider.allActionMovies;
+      case MovieCategory.comedy:
+        return provider.allComedyMovies;
+      case MovieCategory.horror:
+        return provider.allHorrorMovies;
     }
   }
 
@@ -121,6 +157,12 @@ class _SeeAllPageState extends State<SeeAllPage> {
         return provider.isLoadingMoreTopRated;
       case MovieCategory.upcoming:
         return provider.isLoadingMoreUpcoming;
+      case MovieCategory.action:
+        return provider.isLoadingMoreAction;
+      case MovieCategory.comedy:
+        return provider.isLoadingMoreComedy;
+      case MovieCategory.horror:
+        return provider.isLoadingMoreHorror;
     }
   }
 
@@ -133,6 +175,12 @@ class _SeeAllPageState extends State<SeeAllPage> {
         return provider.hasMoreTopRated;
       case MovieCategory.upcoming:
         return provider.hasMoreUpcoming;
+      case MovieCategory.action:
+        return provider.hasMoreAction;
+      case MovieCategory.comedy:
+        return provider.hasMoreComedy;
+      case MovieCategory.horror:
+        return provider.hasMoreHorror;
     }
   }
 

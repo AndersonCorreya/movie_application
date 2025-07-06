@@ -5,6 +5,7 @@ import 'package:movieapplication/Model/watchlist_model.dart';
 class WatchlistService {
   static const String _watchlistBoxName = 'watchlists';
   static const String _moviesBoxName = 'movies';
+  static const String _defaultWatchlistId = 'default_watchlist';
 
   late Box<Watchlist> _watchlistBox;
   late Box<Movie> _moviesBox;
@@ -27,6 +28,28 @@ class WatchlistService {
     // Open boxes
     _watchlistBox = await Hive.openBox<Watchlist>(_watchlistBoxName);
     _moviesBox = await Hive.openBox<Movie>(_moviesBoxName);
+
+    // Ensure default watchlist exists
+    await _ensureDefaultWatchlistExists();
+  }
+
+  // Ensure default watchlist exists
+  Future<void> _ensureDefaultWatchlistExists() async {
+    final defaultWatchlist = _watchlistBox.get(_defaultWatchlistId);
+    if (defaultWatchlist == null) {
+      final newDefaultWatchlist = Watchlist(
+        id: _defaultWatchlistId,
+        name: 'My Watchlist',
+        description: 'Your default watchlist for quick movie additions',
+        isDefault: true,
+      );
+      await _watchlistBox.put(_defaultWatchlistId, newDefaultWatchlist);
+    }
+  }
+
+  // Get the default watchlist
+  Watchlist? getDefaultWatchlist() {
+    return _watchlistBox.get(_defaultWatchlistId);
   }
 
   // Create a new watchlist
@@ -46,6 +69,13 @@ class WatchlistService {
     return _watchlistBox.values.toList();
   }
 
+  // Get all custom watchlists (excluding default)
+  List<Watchlist> getCustomWatchlists() {
+    return _watchlistBox.values
+        .where((watchlist) => !watchlist.isDefaultWatchlist)
+        .toList();
+  }
+
   // Get a specific watchlist
   Watchlist? getWatchlist(String id) {
     return _watchlistBox.get(id);
@@ -56,9 +86,12 @@ class WatchlistService {
     await _watchlistBox.put(watchlist.id, watchlist);
   }
 
-  // Delete watchlist
+  // Delete watchlist (cannot delete default watchlist)
   Future<void> deleteWatchlist(String id) async {
-    await _watchlistBox.delete(id);
+    final watchlist = _watchlistBox.get(id);
+    if (watchlist != null && !watchlist.isDefaultWatchlist) {
+      await _watchlistBox.delete(id);
+    }
   }
 
   // Add movie to watchlist
