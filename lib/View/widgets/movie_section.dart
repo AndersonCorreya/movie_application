@@ -29,9 +29,9 @@ class MovieSection extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Mulish',
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),

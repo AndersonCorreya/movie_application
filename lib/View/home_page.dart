@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:movieapplication/core/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:movieapplication/ViewModel/movie_provider.dart';
 
@@ -9,6 +8,7 @@ import 'package:movieapplication/View/widgets/movie_section.dart';
 import 'package:movieapplication/View/movie_detail_page.dart';
 import 'package:movieapplication/View/see_all_page.dart';
 import 'package:movieapplication/View/watchlist_page.dart';
+import 'package:movieapplication/View/settings_page.dart';
 
 // Updated Home Page using Provider
 class MovieHomePage extends StatefulWidget {
@@ -36,14 +36,31 @@ class _MovieHomePageState extends State<MovieHomePage> {
     });
   }
 
+  String _getAppBarTitle() {
+    switch (_selectedIndex) {
+      case 0:
+        return 'MyFlicks';
+      case 1:
+        return 'Search';
+      case 2:
+        return 'Watchlist';
+      case 3:
+        return 'Settings';
+      default:
+        return 'MyFlicks';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: scaffoldColor,
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withValues(alpha: 0.5),
+        backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+        selectedItemColor: theme.bottomNavigationBarTheme.selectedItemColor,
+        unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor,
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -55,8 +72,10 @@ class _MovieHomePageState extends State<MovieHomePage> {
               height: 24,
               colorFilter: ColorFilter.mode(
                 _selectedIndex == 0
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.5),
+                    ? theme.bottomNavigationBarTheme.selectedItemColor ??
+                        Colors.blue
+                    : theme.bottomNavigationBarTheme.unselectedItemColor ??
+                        Colors.grey,
                 BlendMode.srcIn,
               ),
             ),
@@ -69,8 +88,10 @@ class _MovieHomePageState extends State<MovieHomePage> {
               height: 20,
               colorFilter: ColorFilter.mode(
                 _selectedIndex == 1
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.5),
+                    ? theme.bottomNavigationBarTheme.selectedItemColor ??
+                        Colors.blue
+                    : theme.bottomNavigationBarTheme.unselectedItemColor ??
+                        Colors.grey,
                 BlendMode.srcIn,
               ),
             ),
@@ -82,20 +103,35 @@ class _MovieHomePageState extends State<MovieHomePage> {
               size: 22,
               color:
                   _selectedIndex == 2
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.5),
+                      ? theme.bottomNavigationBarTheme.selectedItemColor ??
+                          Colors.blue
+                      : theme.bottomNavigationBarTheme.unselectedItemColor ??
+                          Colors.grey,
             ),
             label: 'Watchlist',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.settings_outlined,
+              color:
+                  _selectedIndex == 3
+                      ? theme.bottomNavigationBarTheme.selectedItemColor ??
+                          Colors.blue
+                      : theme.bottomNavigationBarTheme.unselectedItemColor ??
+                          Colors.grey,
+            ),
+            label: 'Settings',
+          ),
         ],
       ),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: const Text('MyFlicks'),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
+        title: Text(_getAppBarTitle()),
+        titleTextStyle: TextStyle(
+          color:
+              theme.appBarTheme.titleTextStyle?.color ??
+              theme.colorScheme.onBackground,
           fontSize: 20,
           fontWeight: FontWeight.bold,
           fontFamily: 'Helvetica',
@@ -265,18 +301,24 @@ class _MovieHomePageState extends State<MovieHomePage> {
   }
 
   Widget _buildSearchPage() {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
           child: TextField(
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: theme.colorScheme.onBackground),
             decoration: InputDecoration(
               hintText: 'Search movies...',
-              hintStyle: const TextStyle(color: Colors.white54),
-              prefixIcon: const Icon(Icons.search, color: Colors.white54),
+              hintStyle: TextStyle(
+                color: theme.colorScheme.onBackground.withOpacity(0.6),
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: theme.colorScheme.onBackground.withOpacity(0.6),
+              ),
               filled: true,
-              fillColor: Colors.grey[800],
+              fillColor: theme.inputDecorationTheme.fillColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -332,11 +374,6 @@ class _MovieHomePageState extends State<MovieHomePage> {
   }
 
   Widget _buildProfilePage() {
-    return const Center(
-      child: Text(
-        'Profile Page',
-        style: TextStyle(color: Colors.white, fontSize: 20),
-      ),
-    );
+    return const SettingsPage();
   }
 }

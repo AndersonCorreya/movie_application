@@ -165,6 +165,12 @@ class MovieProvider extends ChangeNotifier {
     String name, {
     String description = '',
   }) async {
+    // Prevent updating the default watchlist
+    final defaultWatchlist = getDefaultWatchlist();
+    if (defaultWatchlist != null && defaultWatchlist.id == id) {
+      throw Exception('Cannot update the default watchlist');
+    }
+
     final watchlist = _customWatchlists.firstWhere((w) => w.id == id);
     final updatedWatchlist = Watchlist(
       id: id,

@@ -131,28 +131,35 @@ class _MovieDetailPageState extends State<MovieDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     // Add safety check for movie data
     if (widget.movie.id == 0 || widget.movie.title.isEmpty) {
       return Scaffold(
-        backgroundColor: const Color(0xFF0A0A0A),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(
+              Icons.arrow_back,
+              color:
+                  theme.appBarTheme.iconTheme?.color ??
+                  theme.colorScheme.onBackground,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: const Center(
+        body: Center(
           child: Text(
             'Invalid movie data',
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(
+              color: theme.colorScheme.onBackground,
+              fontSize: 18,
+            ),
           ),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: CustomScrollView(
@@ -163,6 +170,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final theme = Theme.of(context);
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -173,11 +181,16 @@ class _MovieDetailPageState extends State<MovieDetailPage>
         child: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.3),
+            color: theme.colorScheme.surface.withOpacity(0.3),
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(
+              Icons.arrow_back,
+              color:
+                  theme.appBarTheme.iconTheme?.color ??
+                  theme.colorScheme.onBackground,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
@@ -189,7 +202,7 @@ class _MovieDetailPageState extends State<MovieDetailPage>
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
+              color: theme.colorScheme.surface.withOpacity(0.3),
               shape: BoxShape.circle,
             ),
             child: Consumer<MovieProvider>(
@@ -200,7 +213,11 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                 return PopupMenuButton<String>(
                   icon: Icon(
                     isInWatchlist ? Icons.bookmark : Icons.bookmark_border,
-                    color: isInWatchlist ? Colors.amber : Colors.white,
+                    color:
+                        isInWatchlist
+                            ? Colors.amber
+                            : (theme.appBarTheme.iconTheme?.color ??
+                                theme.colorScheme.onBackground),
                   ),
                   onSelected: (value) async {
                     HapticFeedback.lightImpact();
@@ -431,10 +448,10 @@ class _MovieDetailPageState extends State<MovieDetailPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Cast',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).textTheme.titleLarge?.color,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -515,8 +532,9 @@ class _MovieDetailPageState extends State<MovieDetailPage>
                         width: 60,
                         child: Text(
                           castMember.name,
-                          style: const TextStyle(
-                            color: Colors.white70,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -542,11 +560,18 @@ class _MovieDetailPageState extends State<MovieDetailPage>
         if (widget.movie.releaseDate != null) ...[
           Row(
             children: [
-              const Icon(Icons.calendar_today, color: Colors.white70, size: 16),
+              Icon(
+                Icons.calendar_today,
+                color: Theme.of(context).textTheme.titleLarge?.color,
+                size: 16,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Release Date: ${widget.movie.releaseDate}',
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -561,10 +586,10 @@ class _MovieDetailPageState extends State<MovieDetailPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Overview',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).textTheme.titleLarge?.color,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -574,8 +599,8 @@ class _MovieDetailPageState extends State<MovieDetailPage>
           (widget.movie.overview?.isNotEmpty == true)
               ? (widget.movie.overview ?? 'No overview available.')
               : 'No overview available.',
-          style: const TextStyle(
-            color: Colors.white70,
+          style: TextStyle(
+            color: Theme.of(context).textTheme.titleLarge?.color,
             fontSize: 15,
             height: 1.5,
           ),
@@ -588,10 +613,10 @@ class _MovieDetailPageState extends State<MovieDetailPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Trailer',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).textTheme.titleLarge?.color,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),

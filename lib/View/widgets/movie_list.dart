@@ -46,11 +46,11 @@ class MovieList extends StatelessWidget {
           height: showRating ? 240 : 220,
           child:
               movies.isEmpty
-                  ? const Center(
+                  ? Center(
                     child: Text(
                       'Refresh to load movies',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                         fontFamily: 'WorkSans',
                       ),
                     ),

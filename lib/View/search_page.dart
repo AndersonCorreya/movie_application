@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movieapplication/core/theme/theme.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -11,27 +10,32 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: scaffoldColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Column(
           children: [
             TextField(
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.colorScheme.onBackground),
               decoration: InputDecoration(
                 hintText: 'Search',
-                hintStyle: TextStyle(color: Colors.white),
+                hintStyle: TextStyle(
+                  color: theme.colorScheme.onBackground.withOpacity(0.6),
+                ),
                 border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: BorderSide(color: theme.colorScheme.primary),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.primary.withOpacity(0.5),
+                  ),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: BorderSide(color: theme.colorScheme.primary),
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),

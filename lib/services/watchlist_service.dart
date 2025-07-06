@@ -40,7 +40,6 @@ class WatchlistService {
       final newDefaultWatchlist = Watchlist(
         id: _defaultWatchlistId,
         name: 'My Watchlist',
-        description: 'Your default watchlist for quick movie additions',
         isDefault: true,
       );
       await _watchlistBox.put(_defaultWatchlistId, newDefaultWatchlist);

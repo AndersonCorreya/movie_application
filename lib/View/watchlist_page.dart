@@ -4,7 +4,6 @@ import 'package:movieapplication/ViewModel/movie_provider.dart';
 import 'package:movieapplication/Model/watchlist_model.dart';
 import 'package:movieapplication/View/widgets/movie_grid.dart';
 import 'package:movieapplication/View/movie_detail_page.dart';
-import 'package:movieapplication/core/theme/theme.dart';
 
 class WatchlistPage extends StatefulWidget {
   const WatchlistPage({Key? key}) : super(key: key);
@@ -28,24 +27,29 @@ class _WatchlistPageState extends State<WatchlistPage> {
     _nameController.clear();
     _descriptionController.clear();
 
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1C2128),
-            title: const Text(
+            backgroundColor: theme.cardTheme.color,
+            title: Text(
               'Create New Watchlist',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.colorScheme.onSurface),
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                  decoration: InputDecoration(
                     labelText: 'Watchlist Name',
-                    labelStyle: TextStyle(color: Colors.white70),
+                    labelStyle: TextStyle(
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white30),
@@ -59,10 +63,14 @@ class _WatchlistPageState extends State<WatchlistPage> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: _descriptionController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                  decoration: InputDecoration(
                     labelText: 'Description (Optional)',
-                    labelStyle: TextStyle(color: Colors.white70),
+                    labelStyle: TextStyle(
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white30),
@@ -101,6 +109,17 @@ class _WatchlistPageState extends State<WatchlistPage> {
   }
 
   void _showEditWatchlistDialog(Watchlist watchlist) {
+    // Prevent editing the default watchlist
+    if (watchlist.isDefaultWatchlist) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('The default watchlist cannot be edited'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     _nameController.text = watchlist.name;
     _descriptionController.text = watchlist.description;
 
@@ -118,10 +137,14 @@ class _WatchlistPageState extends State<WatchlistPage> {
               children: [
                 TextField(
                   controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                  decoration: InputDecoration(
                     labelText: 'Watchlist Name',
-                    labelStyle: TextStyle(color: Colors.white70),
+                    labelStyle: TextStyle(
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white30),
@@ -135,10 +158,14 @@ class _WatchlistPageState extends State<WatchlistPage> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: _descriptionController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                  decoration: InputDecoration(
                     labelText: 'Description (Optional)',
-                    labelStyle: TextStyle(color: Colors.white70),
+                    labelStyle: TextStyle(
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white30),
@@ -246,28 +273,44 @@ class _WatchlistPageState extends State<WatchlistPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ListTile(
-                  leading: const Icon(Icons.edit, color: Colors.blue),
-                  title: const Text(
-                    'Edit Watchlist',
-                    style: TextStyle(color: Colors.white),
+                if (!watchlist
+                    .isDefaultWatchlist) // Only show edit option for non-default watchlists
+                  ListTile(
+                    leading: const Icon(Icons.edit, color: Colors.blue),
+                    title: const Text(
+                      'Edit Watchlist',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showEditWatchlistDialog(watchlist);
+                    },
                   ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showEditWatchlistDialog(watchlist);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.delete, color: Colors.red),
-                  title: const Text(
-                    'Delete Watchlist',
-                    style: TextStyle(color: Colors.red),
+                if (!watchlist
+                    .isDefaultWatchlist) // Only show delete option for non-default watchlists
+                  ListTile(
+                    leading: const Icon(Icons.delete, color: Colors.red),
+                    title: const Text(
+                      'Delete Watchlist',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showDeleteConfirmation(watchlist);
+                    },
                   ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showDeleteConfirmation(watchlist);
-                  },
-                ),
+                if (watchlist
+                    .isDefaultWatchlist) // Show message for default watchlist
+                  ListTile(
+                    leading: const Icon(Icons.info, color: Colors.blue),
+                    title: const Text(
+                      'Default watchlist cannot be edited',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                 const SizedBox(height: 20),
               ],
             ),
@@ -277,8 +320,8 @@ class _WatchlistPageState extends State<WatchlistPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: scaffoldColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: const Text(
@@ -364,7 +407,8 @@ class _WatchlistPageState extends State<WatchlistPage> {
                       ),
                     );
                   },
-                  onLongPress: () => _showWatchlistOptions(watchlist),
+                  onLongPress:
+                      isDefault ? null : () => _showWatchlistOptions(watchlist),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
@@ -454,8 +498,11 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                 children: [
                                   Text(
                                     watchlist.name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge?.color,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -493,8 +540,11 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                 const SizedBox(height: 4),
                                 Text(
                                   watchlist.description,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.titleLarge?.color,
                                     fontSize: 14,
                                   ),
                                   maxLines: 2,
@@ -504,42 +554,45 @@ class _WatchlistPageState extends State<WatchlistPage> {
                               const SizedBox(height: 4),
                               Text(
                                 '${watchlist.movieCount} movie${watchlist.movieCount != 1 ? 's' : ''}',
-                                style: const TextStyle(
-                                  color: Colors.white54,
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.color,
                                   fontSize: 12,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        PopupMenuButton<String>(
-                          icon: const Icon(
-                            Icons.more_vert,
-                            color: Colors.white70,
-                          ),
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              _showEditWatchlistDialog(watchlist);
-                            } else if (value == 'delete') {
-                              _showDeleteConfirmation(watchlist);
-                            }
-                          },
-                          itemBuilder:
-                              (context) => [
-                                const PopupMenuItem(
-                                  value: 'edit',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.edit, color: Colors.blue),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Edit',
-                                        style: TextStyle(color: Colors.blue),
-                                      ),
-                                    ],
+                        if (!isDefault) // Only show popup menu for non-default watchlists
+                          PopupMenuButton<String>(
+                            icon: const Icon(
+                              Icons.more_vert,
+                              color: Colors.white70,
+                            ),
+                            onSelected: (value) {
+                              if (value == 'edit') {
+                                _showEditWatchlistDialog(watchlist);
+                              } else if (value == 'delete') {
+                                _showDeleteConfirmation(watchlist);
+                              }
+                            },
+                            itemBuilder:
+                                (context) => [
+                                  const PopupMenuItem(
+                                    value: 'edit',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.edit, color: Colors.blue),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Edit',
+                                          style: TextStyle(color: Colors.blue),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                if (!isDefault) // Only show delete option for non-default watchlists
                                   const PopupMenuItem(
                                     value: 'delete',
                                     child: Row(
@@ -553,8 +606,8 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                       ],
                                     ),
                                   ),
-                              ],
-                        ),
+                                ],
+                          ),
                       ],
                     ),
                   ),
@@ -576,11 +629,17 @@ class WatchlistDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: scaffoldColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(watchlist.name, style: TextStyle(fontFamily: 'Mulish')),
+        title: Text(
+          watchlist.name,
+          style: TextStyle(
+            fontFamily: 'Mulish',
+            color: theme.textTheme.titleLarge?.color,
+          ),
+        ),
         actions: [
           if (!watchlist
               .isDefaultWatchlist) // Only show delete option for non-default watchlists
@@ -625,18 +684,21 @@ class WatchlistDetailPage extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'No movies in this watchlist',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Add movies from the movie details page',
-                      style: TextStyle(color: Colors.white54, fontSize: 14),
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                        fontSize: 14,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ],

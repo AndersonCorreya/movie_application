@@ -103,8 +103,8 @@ class MoviePosterCard extends StatelessWidget {
                 Flexible(
                   child: Text(
                     movie.title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Mulish',
@@ -124,8 +124,8 @@ class MoviePosterCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       movie.rating!.toStringAsFixed(1),
-                      style: const TextStyle(
-                        color: Colors.white70,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                         fontSize: 12,
                       ),
                     ),

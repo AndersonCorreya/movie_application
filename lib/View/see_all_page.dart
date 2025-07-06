@@ -186,19 +186,26 @@ class _SeeAllPageState extends State<SeeAllPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color:
+                theme.appBarTheme.iconTheme?.color ??
+                theme.colorScheme.onBackground,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           widget.title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color:
+                theme.appBarTheme.titleTextStyle?.color ??
+                theme.colorScheme.onBackground,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontFamily: 'Mulish',
@@ -213,18 +220,23 @@ class _SeeAllPageState extends State<SeeAllPage> {
           final hasMore = _getHasMore();
 
           if (movies.isEmpty && isLoading) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  theme.colorScheme.primary,
+                ),
               ),
             );
           }
 
           if (movies.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
                 'No movies found',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
+                style: TextStyle(
+                  color: theme.colorScheme.onBackground.withOpacity(0.7),
+                  fontSize: 16,
+                ),
               ),
             );
           }
@@ -259,18 +271,23 @@ class _SeeAllPageState extends State<SeeAllPage> {
               if (isLoading)
                 Container(
                   padding: const EdgeInsets.all(16),
-                  child: const Center(
+                  child: Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),
               if (!hasMore && movies.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(16),
-                  child: const Text(
+                  child: Text(
                     'No more movies to load',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    style: TextStyle(
+                      color: theme.colorScheme.onBackground.withOpacity(0.7),
+                      fontSize: 14,
+                    ),
                   ),
                 ),
             ],
