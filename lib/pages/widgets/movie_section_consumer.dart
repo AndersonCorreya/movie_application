@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:movieapplication/providers/movie_provider.dart';
-import 'package:movieapplication/View/widgets/movie_section.dart';
+import 'package:movieapplication/pages/widgets/movie_section.dart';
 import 'package:movieapplication/pages/see_all_page.dart';
 import 'package:movieapplication/Model/movie_model.dart';
 
