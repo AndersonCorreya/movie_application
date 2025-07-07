@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:movieapplication/Model/movie_model.dart';
+import 'package:myflicks/Model/movie_model.dart';
 
 part 'watchlist_model.g.dart';
 

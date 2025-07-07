@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/providers/movie_provider.dart';
-import 'package:movieapplication/pages/widgets/movie_grid.dart';
-import 'package:movieapplication/pages/movie_detail_page.dart';
+import 'package:myflicks/providers/movie_provider.dart';
+import 'package:myflicks/pages/widgets/movie_grid.dart';
+import 'package:myflicks/pages/movie_detail_page.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({Key? key}) : super(key: key);

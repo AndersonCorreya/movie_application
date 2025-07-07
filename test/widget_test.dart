@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-import 'package:movieapplication/providers/movie_provider.dart';
-import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/Model/watchlist_model.dart';
-import 'package:movieapplication/pages/watchlist_page.dart';
+import 'package:myflicks/providers/movie_provider.dart';
+import 'package:myflicks/Model/movie_model.dart';
+import 'package:myflicks/Model/watchlist_model.dart';
+import 'package:myflicks/pages/watchlist_page.dart';
 
 void main() {
   group('Watchlist Icon Tests', () {

@@ -1,6 +1,6 @@
 {
-    "name": "movieapplication",
-    "short_name": "movieapplication",
+      "name": "MyFlicks",
+  "short_name": "MyFlicks",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#000000",

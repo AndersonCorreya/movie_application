@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:movieapplication/providers/movie_provider.dart';
+import 'package:myflicks/providers/movie_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/pages/home_page.dart';
-import 'package:movieapplication/core/theme/theme_provider.dart';
+import 'package:myflicks/pages/app_wrapper.dart';
+import 'package:myflicks/core/theme/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,12 +37,12 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
-            title: 'Movie App',
+            title: 'MyFlicks',
             theme: themeProvider.lightTheme,
             darkTheme: themeProvider.darkTheme,
             themeMode: themeProvider.themeMode,
             debugShowCheckedModeBanner: false,
-            home: const MovieHomePage(),
+            home: const AppWrapper(),
           );
         },
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/providers/movie_provider.dart';
+import 'package:myflicks/Model/movie_model.dart';
+import 'package:myflicks/providers/movie_provider.dart';
 
 class WatchlistSelectionDialog extends StatelessWidget {
   final List<dynamic> watchlists;

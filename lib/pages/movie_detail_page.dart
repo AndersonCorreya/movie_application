@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/Model/cast_model.dart';
-import 'package:movieapplication/providers/movie_provider.dart';
-import 'package:movieapplication/pages/widgets/movie_detail_app_bar.dart';
-import 'package:movieapplication/pages/widgets/movie_hero_section.dart';
-import 'package:movieapplication/pages/widgets/movie_content_section.dart';
-import 'package:movieapplication/pages/widgets/watchlist_dialogs.dart';
+import 'package:myflicks/Model/movie_model.dart';
+import 'package:myflicks/Model/cast_model.dart';
+import 'package:myflicks/providers/movie_provider.dart';
+import 'package:myflicks/pages/widgets/movie_detail_app_bar.dart';
+import 'package:myflicks/pages/widgets/movie_hero_section.dart';
+import 'package:myflicks/pages/widgets/movie_content_section.dart';
+import 'package:myflicks/pages/widgets/watchlist_dialogs.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final Movie movie;

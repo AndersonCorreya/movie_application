@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/providers/movie_provider.dart';
-import 'package:movieapplication/pages/widgets/movie_section_consumer.dart';
-import 'package:movieapplication/pages/see_all_page.dart';
+import 'package:myflicks/providers/movie_provider.dart';
+import 'package:myflicks/pages/widgets/movie_section_consumer.dart';
+import 'package:myflicks/pages/see_all_page.dart';
 
 class HomeContent extends StatelessWidget {
   const HomeContent({Key? key}) : super(key: key);

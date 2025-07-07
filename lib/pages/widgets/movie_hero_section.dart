@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:movieapplication/Model/movie_model.dart';
+import 'package:myflicks/Model/movie_model.dart';
 
 class MovieHeroSection extends StatelessWidget {
   final Movie movie;

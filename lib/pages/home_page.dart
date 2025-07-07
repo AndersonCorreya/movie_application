@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/providers/movie_provider.dart';
-import 'package:movieapplication/pages/widgets/custom_bottom_navigation.dart';
-import 'package:movieapplication/pages/widgets/custom_app_bar.dart';
-import 'package:movieapplication/pages/widgets/home_content.dart';
-import 'package:movieapplication/pages/widgets/search_page.dart';
-import 'package:movieapplication/pages/watchlist_page.dart';
-import 'package:movieapplication/pages/settings_page.dart';
+import 'package:myflicks/providers/movie_provider.dart';
+import 'package:myflicks/pages/widgets/custom_bottom_navigation.dart';
+import 'package:myflicks/pages/widgets/custom_app_bar.dart';
+import 'package:myflicks/pages/widgets/home_content.dart';
+import 'package:myflicks/pages/widgets/search_page.dart';
+import 'package:myflicks/pages/watchlist_page.dart';
+import 'package:myflicks/pages/settings_page.dart';
 
 // Refactored Home Page using segregated widgets
 class MovieHomePage extends StatefulWidget {

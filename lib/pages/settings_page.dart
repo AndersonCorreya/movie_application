@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/core/theme/theme_provider.dart';
+import 'package:myflicks/core/theme/theme_provider.dart';
+
+import 'package:myflicks/pages/about_information.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -45,7 +47,11 @@ class SettingsPage extends StatelessWidget {
                 subtitle: const Text('App version and information'),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () {
-                  // TODO: Navigate to about page
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AboutInformationPage(),
+                    ),
+                  );
                 },
               ),
             ),

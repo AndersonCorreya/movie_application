@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/providers/movie_provider.dart';
+import 'package:myflicks/Model/movie_model.dart';
+import 'package:myflicks/providers/movie_provider.dart';
 
 class MovieDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isVisible;
@@ -131,15 +131,19 @@ class AnimatedWatchlistButton extends StatelessWidget {
                                     : Theme.of(context).colorScheme.primary,
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            isInWatchlist
-                                ? 'Remove from Default Watchlist'
-                                : 'Quick Add to Default Watchlist',
-                            style: TextStyle(
-                              color:
-                                  isInWatchlist
-                                      ? Colors.red
-                                      : Theme.of(context).colorScheme.primary,
+                          Expanded(
+                            child: Text(
+                              isInWatchlist
+                                  ? 'Remove from Default Watchlist'
+                                  : 'Quick Add to Default Watchlist',
+                              style: TextStyle(
+                                color:
+                                    isInWatchlist
+                                        ? Colors.red
+                                        : Theme.of(context).colorScheme.primary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
                             ),
                           ),
                         ],
@@ -151,9 +155,13 @@ class AnimatedWatchlistButton extends StatelessWidget {
                         children: [
                           Icon(Icons.playlist_add, color: Colors.green),
                           SizedBox(width: 8),
-                          Text(
-                            'Add to Custom List',
-                            style: TextStyle(color: Colors.green),
+                          Expanded(
+                            child: Text(
+                              'Add to Custom List',
+                              style: TextStyle(color: Colors.green),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
                           ),
                         ],
                       ),

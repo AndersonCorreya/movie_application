@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/Model/watchlist_model.dart';
+import 'package:myflicks/Model/movie_model.dart';
+import 'package:myflicks/Model/watchlist_model.dart';
 
 class WatchlistService {
   static const String _watchlistBoxName = 'watchlists';

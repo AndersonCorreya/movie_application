@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:movieapplication/providers/movie_provider.dart';
-import 'package:movieapplication/Model/watchlist_model.dart';
-import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/pages/widgets/movie_grid.dart';
-import 'package:movieapplication/pages/movie_detail_page.dart';
+import 'package:myflicks/providers/movie_provider.dart';
+import 'package:myflicks/Model/watchlist_model.dart';
+import 'package:myflicks/Model/movie_model.dart';
+import 'package:myflicks/pages/widgets/movie_grid.dart';
+import 'package:myflicks/pages/movie_detail_page.dart';
 
 class WatchlistPage extends StatefulWidget {
   const WatchlistPage({Key? key}) : super(key: key);

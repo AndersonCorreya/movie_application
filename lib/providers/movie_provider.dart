@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:movieapplication/Model/movie_model.dart';
-import 'package:movieapplication/Model/cast_model.dart';
-import 'package:movieapplication/Model/watchlist_model.dart';
-import 'package:movieapplication/services/watchlist_service.dart';
-import 'package:movieapplication/config/secrets.dart';
+import 'package:myflicks/Model/movie_model.dart';
+import 'package:myflicks/Model/cast_model.dart';
+import 'package:myflicks/Model/watchlist_model.dart';
+import 'package:myflicks/services/watchlist_service.dart';
+import 'package:myflicks/config/secrets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';

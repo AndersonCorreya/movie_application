@@ -50,7 +50,7 @@ A Flutter movie application that allows users to browse movies, search for conte
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd movieapplication
+cd myflicks
 ```
 
 2. Install dependencies:
