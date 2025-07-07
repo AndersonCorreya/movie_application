@@ -144,6 +144,7 @@ class _CreateWatchlistDialogState extends State<CreateWatchlistDialog> {
                 borderSide: BorderSide(color: theme.colorScheme.primary),
               ),
             ),
+            textCapitalization: TextCapitalization.words,
           ),
           const SizedBox(height: 16),
           TextField(
@@ -165,6 +166,7 @@ class _CreateWatchlistDialogState extends State<CreateWatchlistDialog> {
               ),
             ),
             maxLines: 2,
+            textCapitalization: TextCapitalization.sentences,
           ),
         ],
       ),
