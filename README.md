@@ -1,139 +1,201 @@
-# Movie Application
+🎬 MyFlicks – A Movie Watchlist App
 
-A Flutter movie application that allows users to browse movies, search for content, and manage custom watchlists with local storage.
+MyFlicks is a Flutter-based movie application that allows users to browse, search, and curate custom movie watchlists using data from TMDb API. With a focus on minimal design, real-time search, and local data storage, MyFlicks makes organizing your film library effortless—even when offline.
 
-## Features
+📌 About the App
 
-### Movie Browsing
-- **Popular Movies**: Browse trending movies
-- **Top Rated**: Discover highly-rated films
-- **Upcoming**: See movies that are coming soon
-- **Search**: Find movies by title with real-time search
+MyFlicks delivers an immersive movie discovery experience with clean UI, persistent custom watchlists, and rich movie details—all powered by TMDb. Whether you're a casual movie watcher or a film buff, this app will help you explore trending content, save what you love, and build your own watchlist universe.
 
-### Custom Watchlists
-- **Create Multiple Lists**: Organize movies into custom categories
-- **Add/Remove Movies**: Save movies to specific watchlists from the movie detail page
-- **Local Storage**: All watchlist data is stored locally using Hive
-- **Persistent Data**: Watchlists persist between app sessions
+⚙️ Assumptions & Considerations
 
-### Movie Details
-- **Comprehensive Information**: View movie details including cast, ratings, and overview
-- **Cast Information**: See the main cast members for each movie
-- **Watchlist Integration**: Add movies to custom watchlists directly from the detail page
+    The app uses TMDb as its primary content source; availability of data depends on TMDb’s API services.
 
-## Technical Features
+    All watchlist data is stored locally using Hive; syncing across devices is not included in this version.
 
-### State Management
-- **Provider Pattern**: Uses Provider for state management
-- **Real-time Updates**: UI updates automatically when watchlists change
+    API key management is manually configured via a secrets.dart file.
 
-### Local Storage
-- **Hive Database**: Fast, lightweight local database
-- **Offline Support**: All watchlist data works offline
-- **Data Persistence**: Watchlists are saved locally and persist between app launches
+    Due to potential TMDb API blocks on certain networks (e.g., Jio), the app may require VPN for data fetching.
 
-### UI/UX
-- **Dark Theme**: Modern dark theme optimized for movie viewing
-- **Responsive Design**: Works on various screen sizes
-- **Smooth Animations**: Hero animations and smooth transitions
-- **Intuitive Navigation**: Easy-to-use bottom navigation
+    By default the app follows system theme, can change it in the settings as you wish
 
-## Getting Started
+🚀 Features
+🎥 Movie Browsing
 
-### Prerequisites
-- Flutter SDK (3.8.0 or higher)
-- Dart SDK
-- Android Studio / VS Code
+    Popular Movies – Discover what’s trending
 
-### Installation
+    Top Rated – Explore critically acclaimed films
 
-1. Clone the repository:
-```bash
+    Upcoming – Keep an eye on future releases
+
+    Search – Find movies in real-time by title
+
+🗂️ Custom Watchlists
+
+    Create Multiple Lists – Group movies by genre, mood, or preference
+
+    Add/Remove Movies – Manage movies from the detail page
+
+    Offline Support – Watchlists are stored locally with Hive
+
+    Persistent Data – All lists remain saved between app launches
+
+📄 Movie Details
+
+    View full movie information including:
+
+        Poster, rating, overview
+
+        Cast details
+
+    Add to watchlist directly from the movie page
+
+🧑‍💻 Technical Features
+📦 State Management
+
+    Built using the Provider pattern
+
+    Real-time updates on UI when watchlists change
+
+💾 Local Storage
+
+    Hive database for fast and lightweight local persistence
+
+    Offline-first experience for managing watchlists
+
+🖌️ UI/UX
+
+    Dark Mode for an immersive experience
+
+    Responsive Design for multiple device sizes
+
+    Smooth Animations and intuitive navigation
+
+🔧 Getting Started
+✅ Prerequisites
+
+    Flutter SDK 3.8.0 or higher
+
+    Dart SDK
+
+    Android Studio or VS Code
+
+🛠️ Installation
+
+    Clone the repo:
+
 git clone <repository-url>
 cd myflicks
-```
 
-2. Install dependencies:
-```bash
+    Get dependencies:
+
 flutter pub get
-```
 
-3. Generate Hive adapters:
-```bash
+    Generate Hive adapters:
+
 flutter packages pub run build_runner build
-```
 
-4. Run the app:
-```bash
+    Run the app:
+
 flutter run
-```
 
-### Configuration
+🔐 Configuration
 
-1. Create a `lib/config/secrets.dart` file with your TMDB API key:
-```dart
+    Create a file at:
+    lib/config/secrets.dart
+
+    Add the following code with your TMDb API key:
+
 class Secrets {
   static const String movieApiKey = 'YOUR_TMDB_API_KEY';
   static const String movieBaseUrl = 'https://api.themoviedb.org/3';
 }
-```
 
-2. Get your API key from [The Movie Database](https://www.themoviedb.org/settings/api)
+    Get your API key from:
+    The Movie Database
 
-## Usage
+📱 Usage Guide
+➕ Creating a Watchlist
 
-### Creating Watchlists
-1. Navigate to the Watchlist tab
-2. Tap the "+" button in the app bar
-3. Enter a name and optional description
-4. Tap "Create"
+    Go to the Watchlist tab
 
-### Adding Movies to Watchlists
-1. Open any movie detail page
-2. Tap the bookmark icon in the app bar
-3. Select "Add to Custom List"
-4. Choose an existing watchlist or create a new one
+    Tap the “+” button
 
-### Managing Watchlists
-- **View Lists**: Tap on any watchlist to see its movies
-- **Delete Lists**: Use the menu (⋮) on any watchlist to delete it
-- **Remove Movies**: Tap on movies in watchlist detail view to remove them
+    Enter list name and optional description
 
-## Architecture
+    Hit Create
 
-### Models
-- `Movie`: Represents movie data with Hive serialization
-- `Watchlist`: Represents custom watchlists with movie collections
-- `CastMember`: Represents cast information
+🎞️ Adding Movies
 
-### Services
-- `WatchlistService`: Manages Hive database operations for watchlists
+    Visit a movie’s detail page
 
-### ViewModels
-- `MovieProvider`: Main state management for movies and watchlists
+    Tap the bookmark icon
 
-### Views
-- `MovieHomePage`: Main navigation and movie browsing
-- `WatchlistPage`: Custom watchlist management
-- `MovieDetailPage`: Detailed movie information with watchlist integration
+    Choose or create a watchlist
 
-## Dependencies
+🗑️ Managing Watchlists
 
-- `provider`: State management
-- `hive`: Local database
-- `hive_flutter`: Flutter integration for Hive
-- `http`: API requests
-- `cached_network_image`: Image caching
-- `flutter_svg`: SVG support
+    Tap to view any list
 
-## Contributing
+    Remove movies in a watchlist by holding to the poster card
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+    Delete lists using the "⋮" menu
 
-## License
+🧱 Architecture
+📂 Models
 
-This project is licensed under the MIT License. 
+    Movie: Movie data (Hive-serializable)
+
+    Watchlist: Stores movie collections
+
+    CastMember: Stores cast info
+
+🧰 Services
+
+    WatchlistService: Handles Hive operations
+
+🧠 Providers
+
+    MovieProvider: Manages movie & watchlist logic
+
+🖼️ Pages
+
+    MovieHomePage: Main screen with tabs
+
+    WatchlistPage: Manages custom lists
+
+    MovieDetailPage: Movie overview + add to list
+
+📦 Dependencies
+
+    provider – State management
+
+    hive & hive_flutter – Local storage
+
+    http – REST API calls
+
+    cached_network_image – Cached image loading
+
+    flutter_svg – SVG rendering
+
+    shared_preferences
+
+    url_launcher
+
+    flutter_native_splash
+
+
+🤝 Contributing
+
+Contributions are welcome!
+
+    Fork this repo
+
+    Create a new feature branch
+
+    Make your changes & commit
+
+    Submit a pull request
+
+📄 License
+
+This project is licensed under the MIT License.
